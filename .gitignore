@@ -1,0 +1,98 @@
+# ========================
+# Visual Studio / WPF .NET
+# ========================
+
+## Build results
+bin/
+obj/
+[Bb]uild/
+[Ll]og/
+[Tt]emp/
+out/
+
+## Visual Studio user-specific files
+*.user
+*.userosscache
+*.suo
+*.sln.docstates
+*.userprefs
+
+## Backup & auto-generated files
+*.bak
+*.tmp
+*.log
+*.svclog
+*.ide
+
+## Visual Studio cache & profiling
+.vs/
+.vscode/
+*.pidb
+*.userprefs
+*.dbmdl
+*.opendb
+*.VC.db
+*.VC.VC.opendb
+
+## NuGet
+*.nupkg
+*.snupkg
+packages/
+# except build/utility NuGet files
+!packages/build/
+
+## Test results
+TestResults/
+*.trx
+*.coverage
+*.coveragexml
+
+## Publish outputs
+*.Publish.xml
+*.pubxml
+*.publishproj
+
+## Resharper / Rider
+_ReSharper*/
+.idea/
+*.DotSettings.user
+
+## Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+## Other environment-specific
+*.psess
+*.vsp
+*.vspx
+*.vspscc
+*.vssscc
+
+## WPF specific
+# Compiled resource caches
+*.g.*
+*.i.*
+*.baml
+*.cache
+# Design-time generated files
+*.Designer.cs
+*.g.cs
+*.xaml.cs
+
+## Local settings / build configuration
+appsettings.Development.json
+launchSettings.json
+
+## Optional (if using JetBrains Rider or VS Code)
+.idea/
+.vscode/
+
+## Dotnet tooling
+*.dotCover
+project.lock.json
+project.fragment.lock.json
+
+# End of file
+

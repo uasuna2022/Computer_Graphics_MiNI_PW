@@ -79,7 +79,6 @@ $RECYCLE.BIN/
 # Design-time generated files
 *.Designer.cs
 *.g.cs
-*.xaml.cs
 
 ## Local settings / build configuration
 appsettings.Development.json

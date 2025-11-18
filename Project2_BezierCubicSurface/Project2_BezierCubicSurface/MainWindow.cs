@@ -33,23 +33,32 @@ namespace Project2_BezierCubicSurface
                             return;
 
                         MessageBox.Show($"File '{Path.GetFileName(filePath)}' has been successfully read. " +
-                            $"Control points loaded.", "Success!", MessageBoxButtons.OK, 
+                            $"Control points loaded.", "Success!", MessageBoxButtons.OK,
                             MessageBoxIcon.Information);
 
+                        MessageBox.Show($"{Mesh.Instance.CheckControlPoints()}");
                         // TODO: invalidate everything and redraw main mesh etc.
                     }
                     catch (IOException ex)
                     {
-                        MessageBox.Show($"Message while reading a file: {ex.Message}", "I/O error", 
+                        MessageBox.Show($"Message while reading a file: {ex.Message}", "I/O error",
                             MessageBoxButtons.OK, MessageBoxIcon.Error);
                     }
                     catch (Exception ex)
                     {
-                        MessageBox.Show($"Unexpected error caught: {ex.Message}", "unexpected error", 
+                        MessageBox.Show($"Unexpected error caught: {ex.Message}", "unexpected error",
                             MessageBoxButtons.OK, MessageBoxIcon.Error);
                     }
                 }
             }
+        }
+
+        private void WorkspacePanel_Paint(object sender, PaintEventArgs e)
+        {
+            Graphics g = e.Graphics;
+
+            g.ScaleTransform(1, -1);
+            g.TranslateTransform(WorkspacePanel.Width / 2, -WorkspacePanel.Height / 2);
         }
     }
 }

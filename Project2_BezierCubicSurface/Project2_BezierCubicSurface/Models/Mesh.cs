@@ -24,5 +24,20 @@ namespace Project2_BicubicBezierSurface.Models
         }
 
         public void SetControlPoints(Vector3[,] cp) => ControlPoints = cp;
+
+        public string CheckControlPoints() // Made for debug purposes
+        {
+            string ans = "";
+            for (int i = 0; i < 4; i++)
+            {
+                for (int j = 0; j < 4; j++)
+                {
+                    ans += ControlPoints[i, j].ToString();
+                    ans += "\n";
+                }
+            }
+
+            return ans;
+        }
     }
 }

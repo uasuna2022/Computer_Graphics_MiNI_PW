@@ -7,12 +7,9 @@ namespace Project2_BezierCubicSurface
 {
     public partial class MainWindow : Form
     {
-        public Mesh Mesh { get; set; }
         public MainWindow()
         {
             InitializeComponent();
-
-            Mesh = new Mesh();
         }
 
         private void loadControlPointsToolStripMenuItem_Click(object sender, EventArgs e)
@@ -31,12 +28,9 @@ namespace Project2_BezierCubicSurface
                     try
                     {
                         fileContent = File.ReadAllText(filePath);
-                        Mesh mesh = new Mesh();
 
-                        if (!BezierSurfaceFileLoader.TryParseDataFromFile(fileContent, out mesh))
+                        if (!BezierSurfaceFileLoader.TryParseDataFromFile(fileContent))
                             return;
-
-                        Mesh = mesh;
 
                         MessageBox.Show($"File '{Path.GetFileName(filePath)}' has been successfully read. " +
                             $"Control points loaded.", "Success!", MessageBoxButtons.OK, 

@@ -10,18 +10,17 @@ namespace Project2_BicubicBezierSurface
 {
     public static class BezierSurfaceFileLoader
     {
-        public static bool TryParseDataFromFile(string fileContent, out Mesh mesh)
+        public static bool TryParseDataFromFile(string fileContent)
         {
-            mesh = new Mesh();
             string errorMessage = "";
-            Vector3[,]? ControlPointsFromFile = ParseFile(fileContent, out errorMessage); 
-            if (ControlPointsFromFile == null)
+            Vector3[,]? controlPointsFromFile = ParseFile(fileContent, out errorMessage); 
+            if (controlPointsFromFile == null)
             {
                 MessageBox.Show(errorMessage, "", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return false;
             }
 
-            mesh.ControlPoints = ControlPointsFromFile;
+            Mesh.Instance.SetControlPoints(controlPointsFromFile);
             return true;
         }
 

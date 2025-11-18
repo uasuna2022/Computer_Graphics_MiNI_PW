@@ -9,17 +9,20 @@ namespace Project2_BicubicBezierSurface.Models
 {
     public sealed class Mesh
     {
-        public Vector3[,] ControlPoints { get; set; }
+        private static Mesh? _instance;
+        public static Mesh Instance => _instance ??= new Mesh();
+
+        public Vector3[,] ControlPoints { get; private set; }
         public List<Triangle> Triangles { get; set; }
         public Vertex[,] Vertices { get; set; }
 
-        public static readonly int ControlPointsPerOneCurve = 4;
-
-        public Mesh()
+        private Mesh()
         {
             Triangles = new List<Triangle>();
-            Vertices = new Vertex[ControlPointsPerOneCurve, ControlPointsPerOneCurve];
-            ControlPoints = new Vector3[ControlPointsPerOneCurve, ControlPointsPerOneCurve];
+            Vertices = new Vertex[4, 4];
+            ControlPoints = new Vector3[4, 4];
         }
+
+        public void SetControlPoints(Vector3[,] cp) => ControlPoints = cp;
     }
 }

@@ -10,10 +10,22 @@
 
   <ItemGroup>
     <None Remove="Resources\test.txt" />
+    <None Remove="Resources\test2.txt" />
+    <None Remove="Resources\test3.txt" />
+    <None Remove="Resources\test4.txt" />
   </ItemGroup>
 
   <ItemGroup>
     <Content Include="Resources\test.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\test2.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\test3.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\test4.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>

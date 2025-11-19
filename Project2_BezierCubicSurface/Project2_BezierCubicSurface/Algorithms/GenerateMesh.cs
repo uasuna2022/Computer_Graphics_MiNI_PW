@@ -10,13 +10,13 @@ namespace Project2_BicubicBezierSurface.Algorithms
 {
     public static class GenerateMesh
     {
-        public static void GenerateMesh(int resolution)
+        public static void GetMesh(int resolution)
         {
             if (Mesh.Instance.ControlPoints == null)
                 return;
 
             int pointCount = resolution + 1;
-            Vector3[,] vertices = new Vector3[pointCount, pointCount];
+            Vertex[,] newVertices = new Vertex[pointCount, pointCount];
             List<Triangle> triangles = new List<Triangle>();
 
             int vertexID = 0;
@@ -27,11 +27,44 @@ namespace Project2_BicubicBezierSurface.Algorithms
                     float u = (float)i / resolution;
                     float v = (float)j / resolution;
 
+                    Vector3 pos = CalculateBezierPoint(u, v);
+                    newVertices[i, j] = new Vertex(vertexID, pos, u, v);
+                    vertexID++;
                 }
             }
 
+            Mesh.Instance.SetVertices(newVertices);
+
+            for (int i = 0; i < pointCount - 1; i++)
+            {
+                for (int j = 0; j < pointCount - 1; j++)
+                {
+                    Vertex A = Mesh.Instance.Vertices[i, j];
+                    Vertex B = Mesh.Instance.Vertices[i, j + 1];
+                    Vertex C = Mesh.Instance.Vertices[i + 1, j + 1];
+                    Vertex D = Mesh.Instance.Vertices[i + 1, j];
+
+                    triangles.Add(new Triangle(A.VertexID, B.VertexID, D.VertexID));
+                    triangles.Add(new Triangle(B.VertexID, C.VertexID, D.VertexID));
+                }
+            }
+
+            Mesh.Instance.SetTriangles(triangles);
         }
 
-        public static Vector3 CalculateBezierPoint()
+        public static Vector3 CalculateBezierPoint(float u, float v)
+        {
+            Vector3 bp = Vector3.Zero;
+            for (int i = 0; i < 4; i++)
+            {
+                for (int j = 0; j < 4; j++)
+                {
+                    bp += Mesh.Instance.ControlPoints[i, j] * BernsteinCoefficients.Coefficient(u, i, 3) *
+                        BernsteinCoefficients.Coefficient(v, j, 3);
+                }
+            }
+
+            return bp;
+        }
     }
 }

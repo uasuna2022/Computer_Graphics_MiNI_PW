@@ -13,8 +13,8 @@ namespace Project2_BicubicBezierSurface.Models
         public static Mesh Instance => _instance ??= new Mesh();
 
         public Vector3[,] ControlPoints { get; private set; }
-        public List<Triangle> Triangles { get; set; }
-        public Vertex[,] Vertices { get; set; }
+        public List<Triangle> Triangles { get; private set; }
+        public Vertex[,] Vertices { get; private set; }
 
         private Mesh()
         {
@@ -24,6 +24,8 @@ namespace Project2_BicubicBezierSurface.Models
         }
 
         public void SetControlPoints(Vector3[,] cp) => ControlPoints = cp;
+        public void SetVertices(Vertex[,] v) => Vertices = v;
+        public void SetTriangles(List<Triangle> t) => Triangles = t;
 
         public string CheckControlPoints() // Made for debug purposes
         {
@@ -38,6 +40,12 @@ namespace Project2_BicubicBezierSurface.Models
             }
 
             return ans;
+        }
+
+        public Vertex GetVertexByID(int vertexID)
+        {
+            int width = Vertices.GetLength(1);
+            return Vertices[vertexID / width, vertexID % width];
         }
     }
 }

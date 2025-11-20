@@ -13,6 +13,14 @@ namespace Project2_BezierCubicSurface
         public MainWindow()
         {
             InitializeComponent();
+            
+            // Magic code to enable Double Buffering on a Panel
+            typeof(Panel).InvokeMember("DoubleBuffered",
+                System.Reflection.BindingFlags.SetProperty |
+                System.Reflection.BindingFlags.Instance |
+                System.Reflection.BindingFlags.NonPublic,
+                null, WorkspacePanel, new object[] { true });
+            
         }
 
         private void loadControlPointsToolStripMenuItem_Click(object sender, EventArgs e)
@@ -72,7 +80,7 @@ namespace Project2_BezierCubicSurface
                 Mesh.Instance.Triangles.Count == 0)
                 return;
 
-            GenerateMesh.GetMesh();
+            //GenerateMesh.GetMesh();
             if (Mesh.Instance.ShowControlPoints)
                 DrawControlPoints(g);
             if (Mesh.Instance.ShowMesh)
@@ -172,6 +180,7 @@ namespace Project2_BezierCubicSurface
             int newResolution = ResolutionTrackBar.Value;
             ResolutionValueLabel.Text = newResolution.ToString();
             Mesh.Instance.SetResolution(newResolution);
+            GenerateMesh.GetMesh();
             WorkspacePanel.Invalidate();
         }
 

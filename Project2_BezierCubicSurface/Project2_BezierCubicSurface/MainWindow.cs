@@ -4,6 +4,7 @@ using Project2_BicubicBezierSurface.Models;
 using System.IO;
 using System.Numerics;
 using System.Windows.Forms;
+using System.Windows;
 
 namespace Project2_BezierCubicSurface
 {
@@ -34,14 +35,16 @@ namespace Project2_BezierCubicSurface
                         if (!BezierSurfaceFileLoader.TryParseDataFromFile(fileContent))
                             return;
 
+                        /*
                         MessageBox.Show($"File '{Path.GetFileName(filePath)}' has been successfully read. " +
                             $"Control points loaded.", "Success!", MessageBoxButtons.OK,
                             MessageBoxIcon.Information);
 
                         MessageBox.Show($"{Mesh.Instance.CheckControlPoints()}");
+                        */
 
-                        // TODO: invalidate everything and redraw main mesh etc.
-                        GenerateMesh.GetMesh(20);
+                        EnableAll();
+                        GenerateMesh.GetMesh();
                         WorkspacePanel.Invalidate();
                     }
                     catch (IOException ex)
@@ -69,6 +72,18 @@ namespace Project2_BezierCubicSurface
                 Mesh.Instance.Triangles.Count == 0)
                 return;
 
+            GenerateMesh.GetMesh();
+            if (Mesh.Instance.ShowControlPoints)
+                DrawControlPoints(g);
+            if (Mesh.Instance.ShowMesh)
+            {
+                DrawVertices(g);
+                DrawTriangles(g);
+            }
+        }
+
+        private void DrawVertices(Graphics g)
+        {
             int N = Mesh.Instance.Vertices.GetLength(0);
             int M = Mesh.Instance.Vertices.GetLength(1);
             for (int i = 0; i < N; i++)
@@ -83,7 +98,10 @@ namespace Project2_BezierCubicSurface
                         vertexRadius * 2);
                 }
             }
+        }
 
+        private void DrawTriangles(Graphics g)
+        {
             Pen pen = new Pen(Brushes.Black);
             foreach (Triangle triangle in Mesh.Instance.Triangles)
             {
@@ -95,6 +113,77 @@ namespace Project2_BezierCubicSurface
                 g.DrawLine(pen, p2.X, p2.Y, p3.X, p3.Y);
                 g.DrawLine(pen, p3.X, p3.Y, p1.X, p1.Y);
             }
+        }
+
+        private void DrawControlPoints(Graphics g)
+        {
+            for (int i = 0; i < 4; i++)
+            {
+                for (int j = 0; j < 4; j++)
+                {
+                    Vector3 cp = Mesh.Instance.ControlPoints[i, j];
+                    float x = cp.X;
+                    float y = cp.Y;
+                    int vertexRadius = 4;
+
+                    g.FillEllipse(Brushes.DarkOrange, x - vertexRadius, y - vertexRadius, vertexRadius * 2,
+                        vertexRadius * 2);
+                }
+            }
+
+            Pen pen = new Pen(Brushes.Orange);
+            for (int i = 0; i <= 3; i++)
+            {
+                for (int j = 0; j < 3; j++)
+                {
+                    Vector3 cp1 = Mesh.Instance.ControlPoints[i, j];
+                    Vector3 cp2 = Mesh.Instance.ControlPoints[i, j + 1];
+                    g.DrawLine(pen, cp1.X, cp1.Y, cp2.X, cp2.Y);
+                }
+            }
+
+            for (int i = 0; i <= 3; i++)
+            {
+                for (int j = 0; j < 3; j++)
+                {
+                    Vector3 cp1 = Mesh.Instance.ControlPoints[j, i];
+                    Vector3 cp2 = Mesh.Instance.ControlPoints[j + 1, i];
+                    g.DrawLine(pen, cp1.X, cp1.Y, cp2.X, cp2.Y);
+                }
+            }
+        }
+
+        private void EnableAll()
+        {
+            ShowMeshCheckBox.Enabled = true;
+            ShowControlPointsCheckBox.Enabled = true;
+            FillTrianglesCheckBox.Enabled = true;
+            ResolutionTrackBar.Enabled = true;
+        }
+
+        private void ShowMeshCheckBox_CheckedChanged(object sender, EventArgs e)
+        {
+            Mesh.Instance.ShowMesh = ShowMeshCheckBox.Checked;
+            WorkspacePanel.Invalidate();
+        }
+
+        private void trackBar1_ValueChanged(object sender, EventArgs e)
+        {
+            int newResolution = ResolutionTrackBar.Value;
+            ResolutionValueLabel.Text = newResolution.ToString();
+            Mesh.Instance.SetResolution(newResolution);
+            WorkspacePanel.Invalidate();
+        }
+
+        private void ShowControlPointsCheckBox_CheckedChanged(object sender, EventArgs e)
+        {
+            Mesh.Instance.ShowControlPoints = ShowControlPointsCheckBox.Checked;
+            WorkspacePanel.Invalidate();
+        }
+
+        private void FillTrianglesCheckBox_CheckedChanged(object sender, EventArgs e)
+        {
+            // TODO in the future
         }
     }
 }

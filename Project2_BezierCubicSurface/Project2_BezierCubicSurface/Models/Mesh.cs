@@ -16,16 +16,29 @@ namespace Project2_BicubicBezierSurface.Models
         public List<Triangle> Triangles { get; private set; }
         public Vertex[,] Vertices { get; private set; }
 
+        public int Resolution { get; private set; }
+
+        public bool ShowMesh { get; set; } = false;
+        public bool ShowControlPoints { get; set; } = true;
+        public bool FillTriangles { get; set; } = false;
+
         private Mesh()
         {
             Triangles = new List<Triangle>();
             Vertices = new Vertex[4, 4];
             ControlPoints = new Vector3[4, 4];
+            Resolution = 20;
         }
 
         public void SetControlPoints(Vector3[,] cp) => ControlPoints = cp;
         public void SetVertices(Vertex[,] v) => Vertices = v;
         public void SetTriangles(List<Triangle> t) => Triangles = t;
+        public void SetResolution(int resolution)
+        {
+            if (resolution < 1)
+                Resolution = 1;
+            else Resolution = resolution;
+        }
 
         public string CheckControlPoints() // Made for debug purposes
         {

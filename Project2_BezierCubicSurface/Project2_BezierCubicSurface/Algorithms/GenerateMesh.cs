@@ -10,10 +10,12 @@ namespace Project2_BicubicBezierSurface.Algorithms
 {
     public static class GenerateMesh
     {
-        public static void GetMesh(int resolution)
+        public static void GetMesh()
         {
             if (Mesh.Instance.ControlPoints == null)
                 return;
+
+            int resolution = Mesh.Instance.Resolution;
 
             int pointCount = resolution + 1;
             Vertex[,] newVertices = new Vertex[pointCount, pointCount];

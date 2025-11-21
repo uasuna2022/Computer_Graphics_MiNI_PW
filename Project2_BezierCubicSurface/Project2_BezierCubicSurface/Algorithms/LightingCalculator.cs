@@ -48,12 +48,10 @@ namespace Project2_BicubicBezierSurface.Algorithms
         public static Vector3 CalculateColorVector(Vector3 lightColor, Vector3 objectColor, 
             float kd, Vector3 normalVector, Vector3 lightVersor, float ks, float m)
         {
-            Vector3.Normalize(normalVector); // N normalized
-            // Vector3.Normalize(lightVersor);  L normalized
-            //                                  V normalized (observer will be hardcoded as [0,0,1]
+            normalVector = Vector3.Normalize(normalVector);
             
             Vector3 R = 2 * Vector3.Dot(normalVector, lightVersor) * normalVector - lightVersor;
-            Vector3.Normalize(R);            // R normalized
+            R = Vector3.Normalize(R);            
 
             float cosNL = Math.Max(0, Vector3.Dot(normalVector, lightVersor));
             float cosVR = Math.Max(0, Vector3.Dot(Vector3.UnitZ, R));
@@ -62,9 +60,22 @@ namespace Project2_BicubicBezierSurface.Algorithms
 
             Vector3 color = kd * lightColor * objectColor * cosNL +
                 ks * lightColor * objectColor * cosVR;
-            Vector3.Clamp(color, Vector3.Zero, Vector3.One);
+            color = Vector3.Clamp(color, Vector3.Zero, Vector3.One);
 
             return color;
         }
+        public static Color GetRGBColor(Vector3 vectorColor)
+        {
+            int r = (int)(vectorColor.X * 255.0f);
+            int g = (int)(vectorColor.Y * 255.0f);
+            int b = (int)(vectorColor.Z * 255.0f);
+
+            int finalR = Math.Min(255, r);
+            int finalG = Math.Min(255, g);
+            int finalB = Math.Min(255, b);
+
+            return Color.FromArgb(finalR, finalG, finalB);
+        }
+            
     }
 }

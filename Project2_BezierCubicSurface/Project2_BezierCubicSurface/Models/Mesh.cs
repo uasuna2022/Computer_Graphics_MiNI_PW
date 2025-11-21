@@ -29,6 +29,7 @@ namespace Project2_BicubicBezierSurface.Models
         public float Kd { get; private set; } = 0.5F;
         public float Ks { get; private set; } = 0.5F;
 
+        public Vector3 SurfaceColor { get; private set; } = new Vector3(1.0F, 1.0F, 1.0F);
 
         private Mesh()
         {
@@ -52,6 +53,7 @@ namespace Project2_BicubicBezierSurface.Models
         public void SetM(int m) => M = m;
         public void SetKd(float kd) => Kd = kd;
         public void SetKs(float ks) => Ks = ks;
+        public void SetSurfaceColor(Vector3 color) => SurfaceColor = color;
 
         public string CheckControlPoints() // Made for debug purposes
         {

@@ -68,6 +68,7 @@ namespace Project2_BezierCubicSurface
         {
             Graphics g = e.Graphics;
 
+            /* Testing FastBitmap class
             using (FastBitmap buffer = new FastBitmap(WorkspacePanel.Width, WorkspacePanel.Height))
             {
                 buffer.Lock(); // Lock memory for fast access
@@ -94,7 +95,7 @@ namespace Project2_BezierCubicSurface
                 // 2. DISPLAY: Draw the complete image to the screen
                 e.Graphics.DrawImage(buffer.Bitmap, 0, 0);
             }
-
+            */
             g.ScaleTransform(1, -1);
             g.TranslateTransform(WorkspacePanel.Width / 2, -WorkspacePanel.Height / 2);
 
@@ -223,6 +224,10 @@ namespace Project2_BezierCubicSurface
             ResolutionTrackBar.Enabled = true;
             XAxisRotationTrackBar.Enabled = true;
             ZAxisRotationTrackBar.Enabled = true;
+            ColorCheckBox.Enabled = true;
+            SurfaceColorPanel.Enabled = true;
+            ImagePanel.Enabled = true;
+            NormalMapPanel.Enabled = true;
         }
 
         private void ShowMeshCheckBox_CheckedChanged(object sender, EventArgs e)
@@ -289,14 +294,14 @@ namespace Project2_BezierCubicSurface
             float newKs = SpecularCoefficientTrackBar.Value / 100F;
             if (newKd + newKs > 1.0F)
                 newKs = 1.0F - newKd;
-           
+
             DiffuseCoefficientValueLabel.Text = newKd.ToString();
             Mesh.Instance.SetKd(newKd);
             SpecularCoefficientValueLabel.Text = newKs.ToString();
             if (newKs != SpecularCoefficientTrackBar.Value / 100F)
                 SpecularCoefficientTrackBar.Value = (int)(newKs * 100);
             Mesh.Instance.SetKs(newKs);
-            
+
             // TODO: refill the triangles with the new appropriate colors
         }
 
@@ -314,6 +319,25 @@ namespace Project2_BezierCubicSurface
                 DiffuseCoefficientTrackBar.Value = (int)(newKd * 100);
             Mesh.Instance.SetKd(newKd);
             // TODO: refill the triangles with the new appropriate colors
+        }
+
+        private void SurfaceColorPanel_Click(object sender, EventArgs e)
+        {
+            using (ColorDialog colorDialog = new ColorDialog())
+            {
+                colorDialog.Color = SurfaceColorPanel.BackColor;
+                if (colorDialog.ShowDialog() == DialogResult.OK)
+                {
+                    SurfaceColorPanel.BackColor = colorDialog.Color;
+
+                    Vector3 newSurfaceColor = new Vector3(colorDialog.Color.R / 255.0F,
+                        colorDialog.Color.G / 255.0F, colorDialog.Color.B / 255.0F);
+
+                    Mesh.Instance.SetSurfaceColor(newSurfaceColor);
+
+                    // TODO: Invalidate and apply the color 
+                }
+            }
         }
     }
 }

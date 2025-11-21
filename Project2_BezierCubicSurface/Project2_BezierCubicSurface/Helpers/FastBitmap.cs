@@ -23,7 +23,6 @@ namespace Project2_BicubicBezierSurface.Helpers
         {
             _width = width;
             _height = height;
-            // Format32bppArgb is easiest (4 bytes: B, G, R, A)
             Bitmap = new Bitmap(width, height, PixelFormat.Format32bppArgb);
         }
 
@@ -49,7 +48,6 @@ namespace Project2_BicubicBezierSurface.Helpers
             _isLocked = false;
         }
 
-        // Safe SetPixel that ignores coordinates outside the screen
         public void SetPixel(int x, int y, Color color)
         {
             if (!_isLocked) 
@@ -61,10 +59,10 @@ namespace Project2_BicubicBezierSurface.Helpers
             // Stride is the real width of the image row in memory
             int index = (y * _bitmapData!.Stride) + (x * 4);
 
-            _pixels![index] = color.B;     // Blue
-            _pixels[index + 1] = color.G; // Green
-            _pixels[index + 2] = color.R; // Red
-            _pixels[index + 3] = 255;     // Alpha (Fully opaque)
+            _pixels![index] = color.B;     
+            _pixels[index + 1] = color.G; 
+            _pixels[index + 2] = color.R; 
+            _pixels[index + 3] = 255;    
         }
 
         public void Dispose()

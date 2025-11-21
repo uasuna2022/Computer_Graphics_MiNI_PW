@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Numerics;
+using Project2_BicubicBezierSurface.Algorithms;
 
 namespace Project2_BicubicBezierSurface.Models
 {
@@ -28,6 +29,14 @@ namespace Project2_BicubicBezierSurface.Models
             TransformedPosition = position;
             U = u;
             V = v;
+
+            TangentVectorU_BR = MeshProcessor.CalculateTangentU(u, v);
+            TangentVectorV_BR = MeshProcessor.CalculateTangentV(u, v);
+            NormalVector_BR = Vector3.Cross(TangentVectorU_BR, TangentVectorV_BR);
+
+            TangentVectorU_AR = TangentVectorU_BR;
+            TangentVectorV_AR = TangentVectorV_BR;
+            NormalVector_AR = NormalVector_BR;
         }
     }
 }

@@ -68,7 +68,34 @@ namespace Project2_BicubicBezierSurface.Algorithms
 
             return bp;
         }
+        public static Vector3 CalculateTangentU(float u, float v)
+        {
+            Vector3 tangentU = Vector3.Zero;
+            for (int i = 0; i < 4 - 1; i++)
+            {
+                for (int j = 0; j < 4; j++)
+                {
+                    tangentU += (Mesh.Instance.ControlPoints[i + 1, j] - Mesh.Instance.ControlPoints[i, j]) *
+                        BernsteinCoefficients.Coefficient(u, i, 3 - 1) * BernsteinCoefficients.Coefficient(v, j, 3);
+                }
+            }
 
+            return 3 * tangentU;
+        }
+        public static Vector3 CalculateTangentV(float u, float v)
+        {
+            Vector3 tangentV = Vector3.Zero;
+            for (int i = 0; i < 4; i++)
+            {
+                for (int j = 0; j < 4 - 1; j++)
+                {
+                    tangentV += (Mesh.Instance.ControlPoints[i, j + 1] - Mesh.Instance.ControlPoints[i, j]) *
+                        BernsteinCoefficients.Coefficient(u, i, 3) * BernsteinCoefficients.Coefficient(v, j, 3 - 1);
+                }
+            }
+
+            return 3 * tangentV;
+        }
         public static void RotateMesh()
         {
             float angleX = Mesh.Instance.AngleX;
@@ -84,8 +111,22 @@ namespace Project2_BicubicBezierSurface.Algorithms
                     Vector3 originalPosition = Mesh.Instance.Vertices[i, j].OriginalPosition;
                     Vector3 transformedPosition = RotationMatrix.ZRotation(angleZ, originalPosition);
                     transformedPosition = RotationMatrix.XRotation(angleX, transformedPosition);
-
                     Mesh.Instance.Vertices[i, j].TransformedPosition = transformedPosition;
+
+                    Vector3 tangentU = Mesh.Instance.Vertices[i, j].TangentVectorU_BR;
+                    Vector3 tangentURotated = RotationMatrix.ZRotation(angleZ, tangentU);
+                    tangentURotated = RotationMatrix.XRotation(angleX, tangentURotated);
+                    Mesh.Instance.Vertices[i, j].TangentVectorU_AR = tangentURotated;
+
+                    Vector3 tangentV = Mesh.Instance.Vertices[i, j].TangentVectorV_BR;
+                    Vector3 tangentVRotated = RotationMatrix.ZRotation(angleZ, tangentV);
+                    tangentVRotated = RotationMatrix.XRotation(angleX, tangentVRotated);
+                    Mesh.Instance.Vertices[i, j].TangentVectorV_AR = tangentVRotated;
+
+                    Vector3 norm = Mesh.Instance.Vertices[i, j].NormalVector_BR;
+                    Vector3 normRotated = RotationMatrix.ZRotation(angleZ, norm);
+                    normRotated = RotationMatrix.XRotation(angleX, normRotated);
+                    Mesh.Instance.Vertices[i, j].NormalVector_AR = normRotated;
                 }
             }
 
@@ -101,5 +142,6 @@ namespace Project2_BicubicBezierSurface.Algorithms
                 }
             }
         }
+
     }
 }

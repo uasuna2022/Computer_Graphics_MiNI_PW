@@ -82,6 +82,7 @@ namespace Project2_BezierCubicSurface
             {
                 DrawVertices(g);
                 DrawTriangles(g);
+                // DrawNormals(g);
             }
         }
 
@@ -155,6 +156,38 @@ namespace Project2_BezierCubicSurface
                 }
             }
         }
+
+        /*
+        private void DrawNormals(Graphics g)
+        {
+            if (Mesh.Instance.Vertices == null || Mesh.Instance.Vertices.GetLength(0) == 0)
+                return;
+
+            using (Pen normalPen = new Pen(Color.LimeGreen, 1.5f))
+            {
+                const float normalLength = 20.0f;
+                int rows = Mesh.Instance.Vertices.GetLength(0);
+                int cols = Mesh.Instance.Vertices.GetLength(1);
+
+                for (int i = 0; i < rows; i++)
+                {
+                    for (int j = 0; j < cols; j++)
+                    {
+                        if (i % 10 != 0 || j % 10 != 0)
+                            continue;
+                        Vertex v = Mesh.Instance.Vertices[i, j];
+
+                        Vector3 startPos = v.TransformedPosition;
+                        Vector3 normal = v.NormalVector_AR;
+
+                        Vector3 endPos = startPos + normal * normalLength;
+
+                        g.DrawLine(normalPen, startPos.X, startPos.Y, endPos.X, endPos.Y);
+                    }
+                }
+            }
+        }
+        */
 
         private void EnableAll()
         {

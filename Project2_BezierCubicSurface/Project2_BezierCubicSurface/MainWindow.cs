@@ -20,7 +20,6 @@ namespace Project2_BezierCubicSurface
                 System.Reflection.BindingFlags.Instance |
                 System.Reflection.BindingFlags.NonPublic,
                 null, WorkspacePanel, new object[] { true });
-
         }
 
         private void loadControlPointsToolStripMenuItem_Click(object sender, EventArgs e)
@@ -223,7 +222,12 @@ namespace Project2_BezierCubicSurface
 
         private void FillTrianglesCheckBox_CheckedChanged(object sender, EventArgs e)
         {
-            // TODO in the future
+            DiffuseCoefficientTrackBar.Enabled = FillTrianglesCheckBox.Checked;
+            SpecularCoefficientTrackBar.Enabled = FillTrianglesCheckBox.Checked;
+            ShininessExponentTrackBar.Enabled = FillTrianglesCheckBox.Checked;
+            Mesh.Instance.FillTriangles = FillTrianglesCheckBox.Checked;
+
+            // TODO: fill the triangles with the given color
         }
 
         private void ZAxisRotationTrackBar_ValueChanged(object sender, EventArgs e)
@@ -242,6 +246,47 @@ namespace Project2_BezierCubicSurface
             Mesh.Instance.SetAngleX(newXAngle);
             MeshProcessor.RotateMesh();
             WorkspacePanel.Invalidate();
+        }
+
+        private void ShininessExponentTrackBar_ValueChanged(object sender, EventArgs e)
+        {
+            int newM = ShininessExponentTrackBar.Value;
+            ShininessExponentValueLabel.Text = newM.ToString();
+            Mesh.Instance.SetM(newM);
+            // TODO: refill the triangles with the new appropriate colors
+        }
+
+        private void DiffuseCoefficientTrackBar_ValueChanged(object sender, EventArgs e)
+        {
+            float newKd = DiffuseCoefficientTrackBar.Value / 100F;
+            float newKs = SpecularCoefficientTrackBar.Value / 100F;
+            if (newKd + newKs > 1.0F)
+                newKs = 1.0F - newKd;
+           
+            DiffuseCoefficientValueLabel.Text = newKd.ToString();
+            Mesh.Instance.SetKd(newKd);
+            SpecularCoefficientValueLabel.Text = newKs.ToString();
+            if (newKs != SpecularCoefficientTrackBar.Value / 100F)
+                SpecularCoefficientTrackBar.Value = (int)(newKs * 100);
+            Mesh.Instance.SetKs(newKs);
+            
+            // TODO: refill the triangles with the new appropriate colors
+        }
+
+        private void SpecularCoefficientTrackBar_ValueChanged(object sender, EventArgs e)
+        {
+            float newKd = DiffuseCoefficientTrackBar.Value / 100F;
+            float newKs = SpecularCoefficientTrackBar.Value / 100F;
+            if (newKd + newKs > 1.0F)
+                newKd = 1.0F - newKs;
+
+            SpecularCoefficientValueLabel.Text = newKs.ToString();
+            Mesh.Instance.SetKs(newKs);
+            DiffuseCoefficientValueLabel.Text = newKd.ToString();
+            if (newKd != DiffuseCoefficientTrackBar.Value / 100F)
+                DiffuseCoefficientTrackBar.Value = (int)(newKd * 100);
+            Mesh.Instance.SetKd(newKd);
+            // TODO: refill the triangles with the new appropriate colors
         }
     }
 }

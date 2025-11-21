@@ -25,6 +25,9 @@ namespace Project2_BicubicBezierSurface.Models
         public bool ShowControlPoints { get; set; } = true;
         public bool FillTriangles { get; set; } = false;
 
+        public int M { get; private set; } = 50;
+        public float Kd { get; private set; } = 0.5F;
+        public float Ks { get; private set; } = 0.5F;
 
 
         private Mesh()
@@ -46,6 +49,9 @@ namespace Project2_BicubicBezierSurface.Models
         }
         public void SetAngleX(float angleX) => AngleX = angleX;
         public void SetAngleZ(float angleZ) => AngleZ = angleZ;
+        public void SetM(int m) => M = m;
+        public void SetKd(float kd) => Kd = kd;
+        public void SetKs(float ks) => Ks = ks;
 
         public string CheckControlPoints() // Made for debug purposes
         {

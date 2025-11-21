@@ -8,9 +8,9 @@ using Project2_BicubicBezierSurface.Models;
 
 namespace Project2_BicubicBezierSurface.Algorithms
 {
-    public static class GenerateMesh
+    public static class MeshProcessor
     {
-        public static void GetMesh()
+        public static void CreateMesh()
         {
             if (Mesh.Instance.ControlPoints == null)
                 return;
@@ -86,6 +86,18 @@ namespace Project2_BicubicBezierSurface.Algorithms
                     transformedPosition = RotationMatrix.XRotation(angleX, transformedPosition);
 
                     Mesh.Instance.Vertices[i, j].TransformedPosition = transformedPosition;
+                }
+            }
+
+            for (int i = 0; i < 4; i++)
+            {
+                for (int j = 0; j < 4; j++)
+                {
+                    Vector3 originalCP = Mesh.Instance.ControlPoints[i, j];
+                    Vector3 transformedCP = RotationMatrix.ZRotation(angleZ, originalCP);
+                    transformedCP = RotationMatrix.XRotation(angleX, transformedCP);
+
+                    Mesh.Instance.RotatedControlPoints[i, j] = transformedCP;
                 }
             }
         }

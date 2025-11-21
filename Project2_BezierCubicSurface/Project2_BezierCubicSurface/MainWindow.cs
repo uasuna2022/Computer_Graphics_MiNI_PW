@@ -44,10 +44,11 @@ namespace Project2_BezierCubicSurface
                             return;
 
                         EnableAll();
-                        GenerateMesh.GetMesh();
+                        MeshProcessor.CreateMesh();
+                        MeshProcessor.RotateMesh(); // here rotate function in fact does nothing, however it fullfills RotatedCP array
                         ZAxisRotationTrackBar.Value = 0;
                         XAxisRotationTrackBar.Value = 0;
-                        ResolutionTrackBar.Value = 20;
+                        ResolutionTrackBar.Value = 30;
                         WorkspacePanel.Invalidate();
                     }
                     catch (IOException ex)
@@ -123,7 +124,7 @@ namespace Project2_BezierCubicSurface
             {
                 for (int j = 0; j < 4; j++)
                 {
-                    Vector3 cp = Mesh.Instance.ControlPoints[i, j];
+                    Vector3 cp = Mesh.Instance.RotatedControlPoints[i, j];
                     float x = cp.X;
                     float y = cp.Y;
                     int vertexRadius = 4;
@@ -138,8 +139,8 @@ namespace Project2_BezierCubicSurface
             {
                 for (int j = 0; j < 3; j++)
                 {
-                    Vector3 cp1 = Mesh.Instance.ControlPoints[i, j];
-                    Vector3 cp2 = Mesh.Instance.ControlPoints[i, j + 1];
+                    Vector3 cp1 = Mesh.Instance.RotatedControlPoints[i, j];
+                    Vector3 cp2 = Mesh.Instance.RotatedControlPoints[i, j + 1];
                     g.DrawLine(pen, cp1.X, cp1.Y, cp2.X, cp2.Y);
                 }
             }
@@ -148,8 +149,8 @@ namespace Project2_BezierCubicSurface
             {
                 for (int j = 0; j < 3; j++)
                 {
-                    Vector3 cp1 = Mesh.Instance.ControlPoints[j, i];
-                    Vector3 cp2 = Mesh.Instance.ControlPoints[j + 1, i];
+                    Vector3 cp1 = Mesh.Instance.RotatedControlPoints[j, i];
+                    Vector3 cp2 = Mesh.Instance.RotatedControlPoints[j + 1, i];
                     g.DrawLine(pen, cp1.X, cp1.Y, cp2.X, cp2.Y);
                 }
             }
@@ -176,8 +177,8 @@ namespace Project2_BezierCubicSurface
             int newResolution = ResolutionTrackBar.Value;
             ResolutionValueLabel.Text = newResolution.ToString();
             Mesh.Instance.SetResolution(newResolution);
-            GenerateMesh.GetMesh();
-            GenerateMesh.RotateMesh();
+            MeshProcessor.CreateMesh();
+            MeshProcessor.RotateMesh();
             WorkspacePanel.Invalidate();
         }
 
@@ -197,7 +198,7 @@ namespace Project2_BezierCubicSurface
             int newZAngle = ZAxisRotationTrackBar.Value;
             ZRotationLabelValue.Text = newZAngle.ToString();
             Mesh.Instance.SetAngleZ(newZAngle);
-            GenerateMesh.RotateMesh();
+            MeshProcessor.RotateMesh();
             WorkspacePanel.Invalidate();
         }
 
@@ -206,7 +207,7 @@ namespace Project2_BezierCubicSurface
             int newXAngle = XAxisRotationTrackBar.Value;
             XRotationLabelValue.Text = newXAngle.ToString();
             Mesh.Instance.SetAngleX(newXAngle);
-            GenerateMesh.RotateMesh();
+            MeshProcessor.RotateMesh();
             WorkspacePanel.Invalidate();
         }
     }

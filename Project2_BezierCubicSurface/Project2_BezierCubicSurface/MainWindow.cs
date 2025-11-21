@@ -1,10 +1,10 @@
-using Project2_BicubicBezierSurface;
 using Project2_BicubicBezierSurface.Algorithms;
 using Project2_BicubicBezierSurface.Models;
 using System.IO;
 using System.Numerics;
 using System.Windows.Forms;
 using System.Windows;
+using Project2_BicubicBezierSurface.Helpers;
 
 namespace Project2_BezierCubicSurface
 {
@@ -67,6 +67,33 @@ namespace Project2_BezierCubicSurface
         private void WorkspacePanel_Paint(object sender, PaintEventArgs e)
         {
             Graphics g = e.Graphics;
+
+            using (FastBitmap buffer = new FastBitmap(WorkspacePanel.Width, WorkspacePanel.Height))
+            {
+                buffer.Lock(); // Lock memory for fast access
+
+                // Optional: Clear background (write white pixels across the whole buffer)
+                for (int y = 0; y < buffer.Bitmap.Height; y++)
+                {
+                    for (int x = 0; x < buffer.Bitmap.Width; x++)
+                    {
+                        buffer.SetPixel(x, y, Color.White);
+                    }
+                }
+
+                // --- TEST CASE: Draw a simple diagonal line (RED) ---
+                // This confirms SetPixel is writing correctly
+                for (int i = 0; i < Math.Min(buffer.Bitmap.Width, buffer.Bitmap.Height); i += 2)
+                {
+                    buffer.SetPixel(i, i, Color.Red);
+                }
+                // --- END TEST CASE ---
+
+                buffer.Unlock(); // Save changes back to the Bitmap object
+
+                // 2. DISPLAY: Draw the complete image to the screen
+                e.Graphics.DrawImage(buffer.Bitmap, 0, 0);
+            }
 
             g.ScaleTransform(1, -1);
             g.TranslateTransform(WorkspacePanel.Width / 2, -WorkspacePanel.Height / 2);

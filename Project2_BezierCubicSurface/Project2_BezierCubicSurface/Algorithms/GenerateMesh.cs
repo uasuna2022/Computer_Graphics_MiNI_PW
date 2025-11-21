@@ -68,5 +68,26 @@ namespace Project2_BicubicBezierSurface.Algorithms
 
             return bp;
         }
+
+        public static void RotateMesh()
+        {
+            float angleX = Mesh.Instance.AngleX;
+            float angleZ = Mesh.Instance.AngleZ;
+
+            int N = Mesh.Instance.Vertices.GetLength(0);
+            int M = Mesh.Instance.Vertices.GetLength(1);    
+
+            for (int i = 0; i < N; i++)
+            {
+                for (int j = 0; j < M; j++)
+                {
+                    Vector3 originalPosition = Mesh.Instance.Vertices[i, j].OriginalPosition;
+                    Vector3 transformedPosition = RotationMatrix.ZRotation(angleZ, originalPosition);
+                    transformedPosition = RotationMatrix.XRotation(angleX, transformedPosition);
+
+                    Mesh.Instance.Vertices[i, j].TransformedPosition = transformedPosition;
+                }
+            }
+        }
     }
 }

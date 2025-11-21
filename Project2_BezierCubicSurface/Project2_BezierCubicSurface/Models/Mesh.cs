@@ -16,7 +16,7 @@ namespace Project2_BicubicBezierSurface.Models
         public List<Triangle> Triangles { get; private set; }
         public Vertex[,] Vertices { get; private set; }
 
-        public int Resolution { get; private set; }
+        public int Resolution { get; private set; } = 20;
         public float AngleX { get; private set; } = 0;
         public float AngleZ { get; private set; } = 0;
 
@@ -31,7 +31,6 @@ namespace Project2_BicubicBezierSurface.Models
             Triangles = new List<Triangle>();
             Vertices = new Vertex[4, 4];
             ControlPoints = new Vector3[4, 4];
-            Resolution = 20;
         }
 
         public void SetControlPoints(Vector3[,] cp) => ControlPoints = cp;

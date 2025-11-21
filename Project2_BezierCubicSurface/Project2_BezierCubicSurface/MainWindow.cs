@@ -43,16 +43,11 @@ namespace Project2_BezierCubicSurface
                         if (!BezierSurfaceFileLoader.TryParseDataFromFile(fileContent))
                             return;
 
-                        /*
-                        MessageBox.Show($"File '{Path.GetFileName(filePath)}' has been successfully read. " +
-                            $"Control points loaded.", "Success!", MessageBoxButtons.OK,
-                            MessageBoxIcon.Information);
-
-                        MessageBox.Show($"{Mesh.Instance.CheckControlPoints()}");
-                        */
-
                         EnableAll();
                         GenerateMesh.GetMesh();
+                        ZAxisRotationTrackBar.Value = 0;
+                        XAxisRotationTrackBar.Value = 0;
+                        ResolutionTrackBar.Value = 20;
                         WorkspacePanel.Invalidate();
                     }
                     catch (IOException ex)
@@ -62,7 +57,7 @@ namespace Project2_BezierCubicSurface
                     }
                     catch (Exception ex)
                     {
-                        MessageBox.Show($"Unexpected error caught: {ex.Message}", "unexpected error",
+                        MessageBox.Show($"Unexpected error caught: {ex.Message}", "Unexpected error",
                             MessageBoxButtons.OK, MessageBoxIcon.Error);
                     }
                 }
@@ -80,7 +75,6 @@ namespace Project2_BezierCubicSurface
                 Mesh.Instance.Triangles.Count == 0)
                 return;
 
-            //GenerateMesh.GetMesh();
             if (Mesh.Instance.ShowControlPoints)
                 DrawControlPoints(g);
             if (Mesh.Instance.ShowMesh)
@@ -98,8 +92,8 @@ namespace Project2_BezierCubicSurface
             {
                 for (int j = 0; j < M; j++)
                 {
-                    float x = Mesh.Instance.Vertices[i, j].Position.X;
-                    float y = Mesh.Instance.Vertices[i, j].Position.Y;
+                    float x = Mesh.Instance.Vertices[i, j].TransformedPosition.X;
+                    float y = Mesh.Instance.Vertices[i, j].TransformedPosition.Y;
                     int vertexRadius = 2;
 
                     g.FillEllipse(Brushes.AliceBlue, x - vertexRadius, y - vertexRadius, vertexRadius * 2,
@@ -113,9 +107,9 @@ namespace Project2_BezierCubicSurface
             Pen pen = new Pen(Brushes.Black);
             foreach (Triangle triangle in Mesh.Instance.Triangles)
             {
-                Vector3 p1 = Mesh.Instance.GetVertexByID(triangle.V1ID).Position;
-                Vector3 p2 = Mesh.Instance.GetVertexByID(triangle.V2ID).Position;
-                Vector3 p3 = Mesh.Instance.GetVertexByID(triangle.V3ID).Position;
+                Vector3 p1 = Mesh.Instance.GetVertexByID(triangle.V1ID).TransformedPosition;
+                Vector3 p2 = Mesh.Instance.GetVertexByID(triangle.V2ID).TransformedPosition;
+                Vector3 p3 = Mesh.Instance.GetVertexByID(triangle.V3ID).TransformedPosition;
 
                 g.DrawLine(pen, p1.X, p1.Y, p2.X, p2.Y);
                 g.DrawLine(pen, p2.X, p2.Y, p3.X, p3.Y);
@@ -183,6 +177,7 @@ namespace Project2_BezierCubicSurface
             ResolutionValueLabel.Text = newResolution.ToString();
             Mesh.Instance.SetResolution(newResolution);
             GenerateMesh.GetMesh();
+            GenerateMesh.RotateMesh();
             WorkspacePanel.Invalidate();
         }
 
@@ -202,7 +197,7 @@ namespace Project2_BezierCubicSurface
             int newZAngle = ZAxisRotationTrackBar.Value;
             ZRotationLabelValue.Text = newZAngle.ToString();
             Mesh.Instance.SetAngleZ(newZAngle);
-            // TODO: Update vertices and triangles
+            GenerateMesh.RotateMesh();
             WorkspacePanel.Invalidate();
         }
 
@@ -211,7 +206,7 @@ namespace Project2_BezierCubicSurface
             int newXAngle = XAxisRotationTrackBar.Value;
             XRotationLabelValue.Text = newXAngle.ToString();
             Mesh.Instance.SetAngleX(newXAngle);
-            // TODO: Update vertices and triangles
+            GenerateMesh.RotateMesh();
             WorkspacePanel.Invalidate();
         }
     }

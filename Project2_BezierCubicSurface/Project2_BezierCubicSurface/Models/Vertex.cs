@@ -10,11 +10,10 @@ namespace Project2_BicubicBezierSurface.Models
     public sealed class Vertex
     {
         public int VertexID { get; }
-        public Vector3 Position { get; set; }
+        public Vector3 OriginalPosition { get; set; }
         public float U {  get; set; }
         public float V { get; set; }
-        public Vector3 Position_BR { get; set; }
-        public Vector3 Position_AR { get; set; }
+        public Vector3 TransformedPosition { get; set; }
         public Vector3 TangentVectorU_BR { get; set; }   
         public Vector3 TangentVectorU_AR { get; set; }
         public Vector3 TangentVectorV_BR { get; set; }
@@ -25,7 +24,8 @@ namespace Project2_BicubicBezierSurface.Models
         public Vertex(int vertexID, Vector3 position, float u, float v)
         {
             VertexID = vertexID;
-            Position = position;
+            OriginalPosition = position;
+            TransformedPosition = position;
             U = u;
             V = v;
         }

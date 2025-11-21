@@ -17,10 +17,14 @@ namespace Project2_BicubicBezierSurface.Models
         public Vertex[,] Vertices { get; private set; }
 
         public int Resolution { get; private set; }
+        public float AngleX { get; private set; } = 0;
+        public float AngleZ { get; private set; } = 0;
 
         public bool ShowMesh { get; set; } = false;
         public bool ShowControlPoints { get; set; } = true;
         public bool FillTriangles { get; set; } = false;
+
+
 
         private Mesh()
         {
@@ -39,6 +43,8 @@ namespace Project2_BicubicBezierSurface.Models
                 Resolution = 1;
             else Resolution = resolution;
         }
+        public void SetAngleX(float angleX) => AngleX = angleX;
+        public void SetAngleZ(float angleZ) => AngleZ = angleZ;
 
         public string CheckControlPoints() // Made for debug purposes
         {

@@ -13,14 +13,14 @@ namespace Project2_BezierCubicSurface
         public MainWindow()
         {
             InitializeComponent();
-            
+
             // Magic code to enable Double Buffering on a Panel
             typeof(Panel).InvokeMember("DoubleBuffered",
                 System.Reflection.BindingFlags.SetProperty |
                 System.Reflection.BindingFlags.Instance |
                 System.Reflection.BindingFlags.NonPublic,
                 null, WorkspacePanel, new object[] { true });
-            
+
         }
 
         private void loadControlPointsToolStripMenuItem_Click(object sender, EventArgs e)
@@ -167,6 +167,8 @@ namespace Project2_BezierCubicSurface
             ShowControlPointsCheckBox.Enabled = true;
             FillTrianglesCheckBox.Enabled = true;
             ResolutionTrackBar.Enabled = true;
+            XAxisRotationTrackBar.Enabled = true;
+            ZAxisRotationTrackBar.Enabled = true;
         }
 
         private void ShowMeshCheckBox_CheckedChanged(object sender, EventArgs e)
@@ -193,6 +195,24 @@ namespace Project2_BezierCubicSurface
         private void FillTrianglesCheckBox_CheckedChanged(object sender, EventArgs e)
         {
             // TODO in the future
+        }
+
+        private void ZAxisRotationTrackBar_ValueChanged(object sender, EventArgs e)
+        {
+            int newZAngle = ZAxisRotationTrackBar.Value;
+            ZRotationLabelValue.Text = newZAngle.ToString();
+            Mesh.Instance.SetAngleZ(newZAngle);
+            // TODO: Update vertices and triangles
+            WorkspacePanel.Invalidate();
+        }
+
+        private void XAxisRotationTrackBar_ValueChanged(object sender, EventArgs e)
+        {
+            int newXAngle = XAxisRotationTrackBar.Value;
+            XRotationLabelValue.Text = newXAngle.ToString();
+            Mesh.Instance.SetAngleX(newXAngle);
+            // TODO: Update vertices and triangles
+            WorkspacePanel.Invalidate();
         }
     }
 }

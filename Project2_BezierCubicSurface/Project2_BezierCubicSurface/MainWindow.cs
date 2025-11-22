@@ -68,34 +68,6 @@ namespace Project2_BezierCubicSurface
         {
             Graphics g = e.Graphics;
 
-            /* Testing FastBitmap class
-            using (FastBitmap buffer = new FastBitmap(WorkspacePanel.Width, WorkspacePanel.Height))
-            {
-                buffer.Lock(); // Lock memory for fast access
-
-                // Optional: Clear background (write white pixels across the whole buffer)
-                for (int y = 0; y < buffer.Bitmap.Height; y++)
-                {
-                    for (int x = 0; x < buffer.Bitmap.Width; x++)
-                    {
-                        buffer.SetPixel(x, y, Color.White);
-                    }
-                }
-
-                // --- TEST CASE: Draw a simple diagonal line (RED) ---
-                // This confirms SetPixel is writing correctly
-                for (int i = 0; i < Math.Min(buffer.Bitmap.Width, buffer.Bitmap.Height); i += 2)
-                {
-                    buffer.SetPixel(i, i, Color.Red);
-                }
-                // --- END TEST CASE ---
-
-                buffer.Unlock(); // Save changes back to the Bitmap object
-
-                // 2. DISPLAY: Draw the complete image to the screen
-                e.Graphics.DrawImage(buffer.Bitmap, 0, 0);
-            }
-            */
             g.ScaleTransform(1, -1);
             g.TranslateTransform(WorkspacePanel.Width / 2, -WorkspacePanel.Height / 2);
 
@@ -221,18 +193,22 @@ namespace Project2_BezierCubicSurface
             ShowMeshCheckBox.Enabled = true;
             ShowControlPointsCheckBox.Enabled = true;
             FillTrianglesCheckBox.Enabled = true;
-            ResolutionTrackBar.Enabled = true;
             XAxisRotationTrackBar.Enabled = true;
             ZAxisRotationTrackBar.Enabled = true;
-            ColorCheckBox.Enabled = true;
             SurfaceColorPanel.Enabled = true;
             ImagePanel.Enabled = true;
             NormalMapPanel.Enabled = true;
+            ChooseLightSourceColorPanel.BackColor = Color.FromArgb(255, 255, 192);
+            SurfaceColorPanel.BackColor = Color.FromArgb(192, 255, 192);
+            ImagePanel.BackColor = Color.Transparent;
+            NormalMapPanel.BackColor = Color.Transparent;
+            ChooseLightSourceColorPanel.Enabled = true;
         }
 
         private void ShowMeshCheckBox_CheckedChanged(object sender, EventArgs e)
         {
             Mesh.Instance.ShowMesh = ShowMeshCheckBox.Checked;
+            ResolutionTrackBar.Enabled = ShowMeshCheckBox.Checked;
             WorkspacePanel.Invalidate();
         }
 
@@ -249,6 +225,8 @@ namespace Project2_BezierCubicSurface
         private void ShowControlPointsCheckBox_CheckedChanged(object sender, EventArgs e)
         {
             Mesh.Instance.ShowControlPoints = ShowControlPointsCheckBox.Checked;
+            XAxisRotationTrackBar.Enabled = ShowControlPointsCheckBox.Checked;
+            ZAxisRotationTrackBar.Enabled = ShowControlPointsCheckBox.Checked;
             WorkspacePanel.Invalidate();
         }
 
@@ -257,6 +235,11 @@ namespace Project2_BezierCubicSurface
             DiffuseCoefficientTrackBar.Enabled = FillTrianglesCheckBox.Checked;
             SpecularCoefficientTrackBar.Enabled = FillTrianglesCheckBox.Checked;
             ShininessExponentTrackBar.Enabled = FillTrianglesCheckBox.Checked;
+            ColorCheckBox.Enabled = FillTrianglesCheckBox.Checked;
+            ImageCheckBox.Enabled = FillTrianglesCheckBox.Checked; // TODO: && image loaded
+            NormalMapCheckBox.Enabled = FillTrianglesCheckBox.Checked; // TODO: && normal map loaded
+            LightSourceDistanceTrackbar.Enabled = FillTrianglesCheckBox.Checked;
+            AnimationCheckBox.Enabled = FillTrianglesCheckBox.Checked;
             Mesh.Instance.FillTriangles = FillTrianglesCheckBox.Checked;
 
             // TODO: fill the triangles with the given color
@@ -338,6 +321,46 @@ namespace Project2_BezierCubicSurface
                     // TODO: Invalidate and apply the color 
                 }
             }
+        }
+
+        private void ImagePanel_Click(object sender, EventArgs e)
+        {
+            MessageBox.Show("Load an image logic");
+            // TODO: load an image
+        }
+
+        private void NormalMapPanel_Click(object sender, EventArgs e)
+        {
+            MessageBox.Show("Load a NormalMap logic");
+            // TODO: load NormalMap 
+        }
+
+        private void ChooseLightSourceColorPanel_Click(object sender, EventArgs e)
+        {
+            using (ColorDialog colorDialog = new ColorDialog())
+            {
+                colorDialog.Color = ChooseLightSourceColorPanel.BackColor;
+                if (colorDialog.ShowDialog() == DialogResult.OK)
+                {
+                    ChooseLightSourceColorPanel.BackColor = colorDialog.Color;
+
+                    Vector3 newLightSourceColor = new Vector3(colorDialog.Color.R / 255.0F,
+                        colorDialog.Color.G / 255.0F, colorDialog.Color.B / 255.0F);
+
+                    Mesh.Instance.SetLightSourceColor(newLightSourceColor);
+
+                    // TODO: Invalidate and apply the color 
+                }
+            }
+        }
+
+        private void LightSourceDistanceTrackbar_ValueChanged(object sender, EventArgs e)
+        {
+            int newZCoord = LightSourceDistanceTrackbar.Value;
+            LightSourceDistanceLabelValue.Text = newZCoord.ToString();
+            Mesh.Instance.SetLightSourceZCoord(newZCoord);
+
+            // TODO: Invalidate and apply new z coord
         }
     }
 }

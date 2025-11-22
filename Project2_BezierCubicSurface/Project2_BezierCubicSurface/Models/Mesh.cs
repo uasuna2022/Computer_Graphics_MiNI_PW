@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Numerics;
+using System.Security.Policy;
 
 namespace Project2_BicubicBezierSurface.Models
 {
@@ -29,7 +30,15 @@ namespace Project2_BicubicBezierSurface.Models
         public float Kd { get; private set; } = 0.5F;
         public float Ks { get; private set; } = 0.5F;
 
-        public Vector3 SurfaceColor { get; private set; } = new Vector3(1.0F, 1.0F, 1.0F);
+        public Vector3 SurfaceColor { get; private set; } = new Vector3(192.0F / 255.0F, 1.0F, 192.0F / 255.0F);
+        public Vector3 LightSourceColor { get; private set; } = new Vector3(1.0F, 1.0F, 192.0F / 255.0F);
+
+        public bool EnableAnimation { get; set; } = false;
+        public bool EnableSurfaceColor { get; set; } = false;
+        public bool EnableImage { get; set; } = false;
+        public bool EnableNormalMap { get; set; } = false;
+
+        public int LightSourceZCoord { get; private set; } = 100;
 
         private Mesh()
         {
@@ -54,6 +63,8 @@ namespace Project2_BicubicBezierSurface.Models
         public void SetKd(float kd) => Kd = kd;
         public void SetKs(float ks) => Ks = ks;
         public void SetSurfaceColor(Vector3 color) => SurfaceColor = color;
+        public void SetLightSourceColor(Vector3 color) => LightSourceColor = color;
+        public void SetLightSourceZCoord(int z) => LightSourceZCoord = z;
 
         public string CheckControlPoints() // Made for debug purposes
         {

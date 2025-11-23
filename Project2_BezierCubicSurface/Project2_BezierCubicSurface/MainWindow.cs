@@ -55,7 +55,7 @@ namespace Project2_BezierCubicSurface
             {
                 openFileDialog.Filter = "Text Files (*.txt)|*.txt|All Files (*.*)|*.*";
                 openFileDialog.Title = "Select a .txt file with control points";
-                openFileDialog.InitialDirectory = Path.Combine(Application.StartupPath, "Resources");
+                openFileDialog.InitialDirectory = Path.Combine(Application.StartupPath, "Resources", "ControlPoints");
 
                 if (openFileDialog.ShowDialog() == DialogResult.OK)
                 {
@@ -346,6 +346,8 @@ namespace Project2_BezierCubicSurface
             {
                 openFileDialog.Filter = "Image Files|*.jpg;*.jpeg;*.png;*.bmp";
                 openFileDialog.Title = "Select a texture image";
+                openFileDialog.InitialDirectory = Path.Combine(Application.StartupPath,
+                    "Resources", "Textures_aka_Images");
 
                 if (openFileDialog.ShowDialog() == DialogResult.OK)
                 {
@@ -375,6 +377,8 @@ namespace Project2_BezierCubicSurface
             {
                 openFileDialog.Filter = "Image Files|*.jpg;*.jpeg;*.png;*.bmp";
                 openFileDialog.Title = "Select a normal map";
+                openFileDialog.InitialDirectory = Path.Combine(Application.StartupPath,
+                    "Resources", "NormalMaps");
 
                 if (openFileDialog.ShowDialog() == DialogResult.OK)
                 {

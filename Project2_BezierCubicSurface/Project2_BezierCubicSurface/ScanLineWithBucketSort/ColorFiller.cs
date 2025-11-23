@@ -101,6 +101,18 @@ namespace Project2_BicubicBezierSurface.ScanLineWithBucketSort
                         var (alpha, beta, gamma) = LightingCalculator.CalculateBarycentricCoefficients(
                             p1, p2, p3, new Vector2(x, y));
 
+                        // interpolates U and V image (texture) coordinates
+                        float u = v1.U * alpha + v2.U * beta + v3.U * gamma;
+                        float v = v1.V * alpha + v2.V * beta + v3.V * gamma;
+
+                        Vector3 objectColor = Mesh.Instance.SurfaceColor;
+
+                        if (Mesh.Instance.EnableImage && Mesh.Instance.CurrentTexture != null)
+                        {
+                            // set color from texture map using interpolated U and V 
+                            objectColor = Mesh.Instance.CurrentTexture.GetColorAtUV(u, v);
+                        }
+
                         Vector3 normalInPoint = LightingCalculator.InterpolateNormal(
                             v1.NormalVector_AR, v2.NormalVector_AR, v3.NormalVector_AR,
                             alpha, beta, gamma);
@@ -121,7 +133,7 @@ namespace Project2_BicubicBezierSurface.ScanLineWithBucketSort
 
                         Vector3 finalColor = LightingCalculator.CalculateColorVector(
                             Mesh.Instance.LightSourceColor,
-                            Mesh.Instance.SurfaceColor,
+                            objectColor,
                             Mesh.Instance.Kd,
                             normalNormalized,
                             lightVersor,

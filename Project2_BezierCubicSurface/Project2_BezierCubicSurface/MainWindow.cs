@@ -251,7 +251,8 @@ namespace Project2_BezierCubicSurface
             SpecularCoefficientTrackBar.Enabled = FillTrianglesCheckBox.Checked;
             ShininessExponentTrackBar.Enabled = FillTrianglesCheckBox.Checked;
             ColorCheckBox.Enabled = FillTrianglesCheckBox.Checked;
-            ImageCheckBox.Enabled = FillTrianglesCheckBox.Checked; // TODO: && image loaded
+            ImageCheckBox.Enabled = FillTrianglesCheckBox.Checked && 
+                Mesh.Instance.CurrentTexture != null;
             NormalMapCheckBox.Enabled = FillTrianglesCheckBox.Checked; // TODO: && normal map loaded
             LightSourceDistanceTrackbar.Enabled = FillTrianglesCheckBox.Checked;
             AnimationCheckBox.Enabled = FillTrianglesCheckBox.Checked;
@@ -340,8 +341,31 @@ namespace Project2_BezierCubicSurface
 
         private void ImagePanel_Click(object sender, EventArgs e)
         {
-            MessageBox.Show("Load an image logic");
-            // TODO: load an image
+            using (OpenFileDialog openFileDialog = new OpenFileDialog())
+            {
+                openFileDialog.Filter = "Image Files|*.jpg;*.jpeg;*.png;*.bmp";
+                openFileDialog.Title = "Select a texture image";
+
+                if (openFileDialog.ShowDialog() == DialogResult.OK)
+                {
+                    try
+                    {
+                        Mesh.Instance.LoadTexture(openFileDialog.FileName);
+                        ImageCheckBox.Enabled = FillTrianglesCheckBox.Checked;
+
+                        Image selectedImage = Image.FromFile(openFileDialog.FileName);
+                        selectedImage.RotateFlip(RotateFlipType.Rotate180FlipY);
+                        ImagePanel.BackgroundImage = selectedImage;
+                        ImagePanel.BackgroundImageLayout = ImageLayout.Zoom;
+
+                        WorkspacePanel.Invalidate();
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show($"Error loading image: {ex.Message}");
+                    }
+                }
+            }
         }
 
         private void NormalMapPanel_Click(object sender, EventArgs e)
@@ -383,18 +407,50 @@ namespace Project2_BezierCubicSurface
 
         private void ColorCheckBox_CheckedChanged(object sender, EventArgs e)
         {
-            // TODO
-            
+            Mesh.Instance.EnableSurfaceColor = ColorCheckBox.Checked;
+
+            if (ColorCheckBox.Checked)
+            {
+                Color currentColor = SurfaceColorPanel.BackColor;
+                Vector3 newSurfaceColor = new Vector3(currentColor.R / 255.0F,
+                        currentColor.G / 255.0F, currentColor.B / 255.0F);
+                Mesh.Instance.SetSurfaceColor(newSurfaceColor);
+                if (ImageCheckBox.Checked)
+                    ImageCheckBox.Checked = false;
+
+                Mesh.Instance.EnableImage = false;
+            }
+            else
+            {
+                Mesh.Instance.SetSurfaceColor(new Vector3(0, 0, 0));
+            }
+
+            WorkspacePanel.Invalidate();
         }
 
         private void ImageCheckBox_CheckedChanged(object sender, EventArgs e)
         {
-            // TODO
+            Mesh.Instance.EnableImage = ImageCheckBox.Checked;
+            if (ImageCheckBox.Checked)
+            {
+                if (ColorCheckBox.Checked)
+                    ColorCheckBox.Checked = false;
+
+                Mesh.Instance.EnableSurfaceColor = false;
+            }
+            else
+            {
+                if (!ColorCheckBox.Checked)
+                    ColorCheckBox.Checked = true;
+            }
+                
+            WorkspacePanel.Invalidate();
         }
 
         private void NormalMapCheckBox_CheckedChanged(object sender, EventArgs e)
         {
-            // TODO
+            Mesh.Instance.EnableNormalMap = NormalMapCheckBox.Checked;
+            WorkspacePanel.Invalidate();
         }
 
         private void AnimationCheckBox_CheckedChanged(object sender, EventArgs e)

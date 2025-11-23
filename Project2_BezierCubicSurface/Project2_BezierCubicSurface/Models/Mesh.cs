@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Numerics;
 using System.Security.Policy;
+using Project2_BicubicBezierSurface.Helpers;
 
 namespace Project2_BicubicBezierSurface.Models
 {
@@ -40,6 +41,8 @@ namespace Project2_BicubicBezierSurface.Models
 
         public int LightSourceZCoord { get; private set; } = 100;
         public Vector3 LightSourcePosition { get; private set; }
+
+        public TextureMap? CurrentTexture { get; private set; }
 
         private Mesh()
         {
@@ -88,6 +91,11 @@ namespace Project2_BicubicBezierSurface.Models
         {
             int width = Vertices.GetLength(1);
             return Vertices[vertexID / width, vertexID % width];
+        }
+        public void LoadTexture(string filePath)
+        {
+            CurrentTexture?.Dispose();
+            CurrentTexture = new TextureMap(filePath);
         }
     }
 }

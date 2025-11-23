@@ -10,38 +10,53 @@
 
   <ItemGroup>
     <None Remove="Resources\breathtaking-view-castles-fortresses-top-hill-surrounded-by-trees.jpg" />
-    <None Remove="Resources\neuschwanstein.jpg" />
+    <None Remove="Resources\ControlPoints\twisted-bag-surface.txt" />
+    <None Remove="Resources\neuschwanstein_castle.jpg" />
+    <None Remove="Resources\NormalMaps\normalMap1-technological.png" />
+    <None Remove="Resources\NormalMaps\normalMap1.jpg" />
+    <None Remove="Resources\NormalMaps\normalMap2-sofa.png" />
+    <None Remove="Resources\NormalMaps\normalMap3-bubbles.png" />
+    <None Remove="Resources\NormalMaps\normalMap4-chaotic.jpg" />
+    <None Remove="Resources\NormalMaps\normalMap5.png" />
     <None Remove="Resources\sofa.png" />
     <None Remove="Resources\test.txt" />
     <None Remove="Resources\test2.txt" />
     <None Remove="Resources\test3.txt" />
     <None Remove="Resources\test4.txt" />
     <None Remove="Resources\test5.txt" />
+    <None Remove="Resources\Textures_aka_Images\eva.jpg" />
+    <None Remove="Resources\Textures_aka_Images\graz-view.jpg" />
   </ItemGroup>
 
   <ItemGroup>
-    <Content Include="Resources\breathtaking-view-castles-fortresses-top-hill-surrounded-by-trees.jpg">
+    <Content Include="Resources\ControlPoints\twisted-bag-surface.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Resources\neuschwanstein.jpg">
+    <Content Include="Resources\NormalMaps\normalMap1-technological.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Resources\sofa.png">
+    <Content Include="Resources\NormalMaps\normalMap2-sofa.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Resources\test.txt">
+    <Content Include="Resources\NormalMaps\normalMap3-bubbles.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Resources\test2.txt">
+    <Content Include="Resources\NormalMaps\normalMap4-chaotic.jpg">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Resources\test3.txt">
+    <Content Include="Resources\Textures_aka_Images\castle.jpg">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Resources\test4.txt">
+    <Content Include="Resources\ControlPoints\flat-bottlelike-surface.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Resources\test5.txt">
+    <Content Include="Resources\ControlPoints\main-surface.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\Textures_aka_Images\eva.jpg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\Textures_aka_Images\graz-view.jpg">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>

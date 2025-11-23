@@ -11,6 +11,7 @@
   <ItemGroup>
     <None Remove="Resources\breathtaking-view-castles-fortresses-top-hill-surrounded-by-trees.jpg" />
     <None Remove="Resources\neuschwanstein.jpg" />
+    <None Remove="Resources\sofa.png" />
     <None Remove="Resources\test.txt" />
     <None Remove="Resources\test2.txt" />
     <None Remove="Resources\test3.txt" />
@@ -23,6 +24,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Resources\neuschwanstein.jpg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\sofa.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Resources\test.txt">

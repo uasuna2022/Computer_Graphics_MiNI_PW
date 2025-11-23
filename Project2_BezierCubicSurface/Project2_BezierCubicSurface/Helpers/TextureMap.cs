@@ -63,6 +63,18 @@ namespace Project2_BicubicBezierSurface.Helpers
             return new Vector3(r, g, b);
         }
 
+        public Vector3 GetNormalFromMap(float u, float v)
+        {
+            Vector3 color = GetColorAtUV(u, v);
+
+            // convert U,V from [0,1] to [-1,1] interval
+            float nx = 2.0f * color.X - 1.0f; 
+            float ny = 2.0f * color.Y - 1.0f; 
+            float nz = 2.0f * color.Z - 1.0f; 
+
+            return new Vector3(nx, ny, nz);
+        }
+
         public void Dispose()
         {
             if (_bitmap != null)

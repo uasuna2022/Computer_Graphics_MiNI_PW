@@ -113,15 +113,41 @@ namespace Project2_BicubicBezierSurface.ScanLineWithBucketSort
                             objectColor = Mesh.Instance.CurrentTexture.GetColorAtUV(u, v);
                         }
 
-                        Vector3 normalInPoint = LightingCalculator.InterpolateNormal(
+                        Vector3 N_surface = LightingCalculator.InterpolateNormal(
                             v1.NormalVector_AR, v2.NormalVector_AR, v3.NormalVector_AR,
                             alpha, beta, gamma);
 
-                        if (normalInPoint.LengthSquared() < 1e-6)
+                        if (N_surface.LengthSquared() < 1e-6)
                         {
                             bitmap.SetPixel(x, y, Color.Black);
                             continue;
                         }
+
+                        N_surface = Vector3.Normalize(N_surface);
+                        Vector3 N_final;
+
+                        // this section handles the logic of NormalMap usage:
+                        // N_final = M * N_map, where
+                        // M = [P_u, P_v, N_surface]
+                        if (Mesh.Instance.EnableNormalMap && Mesh.Instance.CurrentNormalMap != null)
+                        {
+                            Vector3 Pu = LightingCalculator.InterpolateNormal(v1.TangentVectorU_AR,
+                                v2.TangentVectorU_AR, v3.TangentVectorU_AR, alpha, beta, gamma);
+                            Vector3 Pv = LightingCalculator.InterpolateNormal(v1.TangentVectorV_AR,
+                                v2.TangentVectorV_AR, v3.TangentVectorV_AR, alpha, beta, gamma);
+
+                            Pu = Vector3.Normalize(Pu);
+                            Pv = Vector3.Normalize(Pv);
+
+                            Vector3 N_map = Mesh.Instance.CurrentNormalMap.GetNormalFromMap(u, v);
+
+                            N_final.X = Pu.X * N_map.X + Pv.X * N_map.Y + N_surface.X * N_map.Z;
+                            N_final.Y = Pu.Y * N_map.X + Pv.Y * N_map.Y + N_surface.Y * N_map.Z;
+                            N_final.Z = Pu.Z * N_map.X + Pv.Z * N_map.Y + N_surface.Z * N_map.Z;
+
+                            N_final = Vector3.Normalize(N_final);
+                        }
+                        else N_final = N_surface;
 
                         Vector3 interpolatedPoint = v1.TransformedPosition * alpha + 
                             v2.TransformedPosition * beta + v3.TransformedPosition * gamma;
@@ -129,13 +155,11 @@ namespace Project2_BicubicBezierSurface.ScanLineWithBucketSort
                         Vector3 lightVersor = LightingCalculator.CalculateLightVersor(
                             Mesh.Instance.LightSourcePosition, interpolatedPoint);
 
-                        Vector3 normalNormalized = Vector3.Normalize(normalInPoint);
-
                         Vector3 finalColor = LightingCalculator.CalculateColorVector(
                             Mesh.Instance.LightSourceColor,
                             objectColor,
                             Mesh.Instance.Kd,
-                            normalNormalized,
+                            N_final,
                             lightVersor,
                             Mesh.Instance.Ks,
                             Mesh.Instance.M);

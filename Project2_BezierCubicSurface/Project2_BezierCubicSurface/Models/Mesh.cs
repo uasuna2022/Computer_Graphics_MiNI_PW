@@ -43,6 +43,7 @@ namespace Project2_BicubicBezierSurface.Models
         public Vector3 LightSourcePosition { get; private set; }
 
         public TextureMap? CurrentTexture { get; private set; }
+        public TextureMap? CurrentNormalMap { get; private set; }
 
         private Mesh()
         {
@@ -96,6 +97,11 @@ namespace Project2_BicubicBezierSurface.Models
         {
             CurrentTexture?.Dispose();
             CurrentTexture = new TextureMap(filePath);
+        }
+        public void LoadNormalMap(string filePath)
+        {
+            CurrentNormalMap?.Dispose();
+            CurrentNormalMap = new TextureMap(filePath);
         }
     }
 }

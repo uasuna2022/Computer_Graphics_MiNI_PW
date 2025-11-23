@@ -253,7 +253,8 @@ namespace Project2_BezierCubicSurface
             ColorCheckBox.Enabled = FillTrianglesCheckBox.Checked;
             ImageCheckBox.Enabled = FillTrianglesCheckBox.Checked && 
                 Mesh.Instance.CurrentTexture != null;
-            NormalMapCheckBox.Enabled = FillTrianglesCheckBox.Checked; // TODO: && normal map loaded
+            NormalMapCheckBox.Enabled = FillTrianglesCheckBox.Checked && 
+                Mesh.Instance.CurrentNormalMap != null;
             LightSourceDistanceTrackbar.Enabled = FillTrianglesCheckBox.Checked;
             AnimationCheckBox.Enabled = FillTrianglesCheckBox.Checked;
             Mesh.Instance.FillTriangles = FillTrianglesCheckBox.Checked;
@@ -370,8 +371,31 @@ namespace Project2_BezierCubicSurface
 
         private void NormalMapPanel_Click(object sender, EventArgs e)
         {
-            MessageBox.Show("Load a NormalMap logic");
-            // TODO: load NormalMap 
+            using (OpenFileDialog openFileDialog = new OpenFileDialog())
+            {
+                openFileDialog.Filter = "Image Files|*.jpg;*.jpeg;*.png;*.bmp";
+                openFileDialog.Title = "Select a normal map";
+
+                if (openFileDialog.ShowDialog() == DialogResult.OK)
+                {
+                    try
+                    {
+                        Mesh.Instance.LoadNormalMap(openFileDialog.FileName);
+                        NormalMapCheckBox.Enabled = FillTrianglesCheckBox.Checked;
+
+                        Image selectedImage = Image.FromFile(openFileDialog.FileName);
+                        selectedImage.RotateFlip(RotateFlipType.Rotate180FlipY);
+                        NormalMapPanel.BackgroundImage = selectedImage;
+                        NormalMapPanel.BackgroundImageLayout = ImageLayout.Zoom;
+
+                        WorkspacePanel.Invalidate();
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show($"Error loading normal map: {ex.Message}");
+                    }
+                }
+            }
         }
 
         private void ChooseLightSourceColorPanel_Click(object sender, EventArgs e)

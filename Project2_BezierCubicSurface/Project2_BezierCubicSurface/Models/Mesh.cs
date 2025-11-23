@@ -39,7 +39,7 @@ namespace Project2_BicubicBezierSurface.Models
         public bool EnableNormalMap { get; set; } = false;
 
         public int LightSourceZCoord { get; private set; } = 100;
-        public Vector3 LightSourcePosition { get; set; }
+        public Vector3 LightSourcePosition { get; private set; }
 
         private Mesh()
         {
@@ -67,6 +67,7 @@ namespace Project2_BicubicBezierSurface.Models
         public void SetSurfaceColor(Vector3 color) => SurfaceColor = color;
         public void SetLightSourceColor(Vector3 color) => LightSourceColor = color;
         public void SetLightSourceZCoord(int z) => LightSourceZCoord = z;
+        public void SetLightSourcePosition(Vector3 pos) => LightSourcePosition = pos;
 
         public string CheckControlPoints() // Made for debug purposes
         {

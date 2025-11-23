@@ -11,6 +11,9 @@ namespace Project2_BezierCubicSurface
 {
     public partial class MainWindow : Form
     {
+        private System.Windows.Forms.Timer _lightAnimationTimer;
+        private float _currentAngle = 0.0F;
+        private float _currentRadius = 0.0F;
         public MainWindow()
         {
             InitializeComponent();
@@ -21,6 +24,29 @@ namespace Project2_BezierCubicSurface
                 System.Reflection.BindingFlags.Instance |
                 System.Reflection.BindingFlags.NonPublic,
                 null, WorkspacePanel, new object[] { true });
+
+            _lightAnimationTimer = new System.Windows.Forms.Timer();
+            _lightAnimationTimer.Interval = 100;
+            _lightAnimationTimer.Tick += _lightAnimationTimer_Tick;
+        }
+
+        private void _lightAnimationTimer_Tick(object? sender, EventArgs e)
+        {
+            const float b = 3.0F;
+            const float dtheta = 5.0F;
+            const float maxRadius = 500.0F;
+
+            _currentAngle = _currentAngle % 360.0F;
+            float newX = _currentRadius * (float)Math.Cos(_currentAngle * (float)(Math.PI / 180.0F));
+            float newY = _currentRadius * (float)Math.Sin(_currentAngle * (float)(Math.PI / 180.0F));
+
+            _currentAngle += dtheta;
+            _currentRadius += b;
+            if (_currentRadius > maxRadius)
+                _currentRadius -= maxRadius;
+
+            Mesh.Instance.SetLightSourcePosition(new Vector3(newX, newY, Mesh.Instance.LightSourceZCoord));
+            WorkspacePanel.Invalidate();
         }
 
         private void loadControlPointsToolStripMenuItem_Click(object sender, EventArgs e)
@@ -348,7 +374,9 @@ namespace Project2_BezierCubicSurface
             int newZCoord = LightSourceDistanceTrackbar.Value;
             LightSourceDistanceLabelValue.Text = newZCoord.ToString();
             Mesh.Instance.SetLightSourceZCoord(newZCoord);
-            Mesh.Instance.LightSourcePosition = new Vector3(0, 0, newZCoord); //  to be changed
+            float x = Mesh.Instance.LightSourcePosition.X;
+            float y = Mesh.Instance.LightSourcePosition.Y;
+            Mesh.Instance.SetLightSourcePosition(new Vector3(x, y, newZCoord)); 
 
             WorkspacePanel.Invalidate();
         }
@@ -371,7 +399,14 @@ namespace Project2_BezierCubicSurface
 
         private void AnimationCheckBox_CheckedChanged(object sender, EventArgs e)
         {
-            // TODO
+            bool animationOn = AnimationCheckBox.Checked;
+            Mesh.Instance.EnableAnimation = AnimationCheckBox.Checked;
+
+            if (animationOn)
+            {
+                _lightAnimationTimer.Start();
+            }
+            else _lightAnimationTimer.Stop();
         }
     }
 }

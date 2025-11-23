@@ -59,6 +59,8 @@ namespace Project2_BezierCubicSurface
                         ColorCheckBox.Checked = false;
                         AnimationCheckBox.Checked = false;
                         LightSourceDistanceTrackbar.Value = 100;
+                        Mesh.Instance.SetLightSourceColor(new Vector3(1.0F, 1.0F, 192.0F / 255.0F));
+                        Mesh.Instance.SetSurfaceColor(new Vector3(192.0F / 255.0F, 1.0F, 192.0F / 255.0F));
                         WorkspacePanel.Invalidate();
                     }
                     catch (IOException ex)
@@ -83,15 +85,10 @@ namespace Project2_BezierCubicSurface
             {
                 fastBitmap.Lock();
 
-                // Perform Scan-line Filling
-                if (Mesh.Instance.FillTriangles)
-                {
+                if (Mesh.Instance.FillTriangles) // TODO: change according to checkboxes
                     ColorFiller.FillMesh(fastBitmap);
-                }
 
                 fastBitmap.Unlock();
-
-                // Draw the result to the screen (0,0 is Top-Left)
                 e.Graphics.DrawImage(fastBitmap.Bitmap, 0, 0);
             }
 
@@ -219,8 +216,6 @@ namespace Project2_BezierCubicSurface
         private void ShowControlPointsCheckBox_CheckedChanged(object sender, EventArgs e)
         {
             Mesh.Instance.ShowControlPoints = ShowControlPointsCheckBox.Checked;
-            XAxisRotationTrackBar.Enabled = ShowControlPointsCheckBox.Checked;
-            ZAxisRotationTrackBar.Enabled = ShowControlPointsCheckBox.Checked;
             WorkspacePanel.Invalidate();
         }
 
@@ -236,8 +231,8 @@ namespace Project2_BezierCubicSurface
             AnimationCheckBox.Enabled = FillTrianglesCheckBox.Checked;
             Mesh.Instance.FillTriangles = FillTrianglesCheckBox.Checked;
 
-            // TODO: fill the triangles with the given color
             WorkspacePanel.Invalidate();
+            ColorCheckBox.Checked = FillTrianglesCheckBox.Checked;
         }
 
         private void ZAxisRotationTrackBar_ValueChanged(object sender, EventArgs e)
@@ -263,7 +258,7 @@ namespace Project2_BezierCubicSurface
             int newM = ShininessExponentTrackBar.Value;
             ShininessExponentValueLabel.Text = newM.ToString();
             Mesh.Instance.SetM(newM);
-            // TODO: refill the triangles with the new appropriate colors
+            WorkspacePanel.Invalidate();
         }
 
         private void DiffuseCoefficientTrackBar_ValueChanged(object sender, EventArgs e)
@@ -279,8 +274,7 @@ namespace Project2_BezierCubicSurface
             if (newKs != SpecularCoefficientTrackBar.Value / 100F)
                 SpecularCoefficientTrackBar.Value = (int)(newKs * 100);
             Mesh.Instance.SetKs(newKs);
-
-            // TODO: refill the triangles with the new appropriate colors
+            WorkspacePanel.Invalidate();
         }
 
         private void SpecularCoefficientTrackBar_ValueChanged(object sender, EventArgs e)
@@ -296,7 +290,7 @@ namespace Project2_BezierCubicSurface
             if (newKd != DiffuseCoefficientTrackBar.Value / 100F)
                 DiffuseCoefficientTrackBar.Value = (int)(newKd * 100);
             Mesh.Instance.SetKd(newKd);
-            // TODO: refill the triangles with the new appropriate colors
+            WorkspacePanel.Invalidate();
         }
 
         private void SurfaceColorPanel_Click(object sender, EventArgs e)
@@ -313,7 +307,7 @@ namespace Project2_BezierCubicSurface
 
                     Mesh.Instance.SetSurfaceColor(newSurfaceColor);
 
-                    // TODO: Invalidate and apply the color 
+                    WorkspacePanel.Invalidate();
                 }
             }
         }
@@ -344,7 +338,7 @@ namespace Project2_BezierCubicSurface
 
                     Mesh.Instance.SetLightSourceColor(newLightSourceColor);
 
-                    // TODO: Invalidate and apply the color 
+                    WorkspacePanel.Invalidate(); 
                 }
             }
         }
@@ -356,7 +350,7 @@ namespace Project2_BezierCubicSurface
             Mesh.Instance.SetLightSourceZCoord(newZCoord);
             Mesh.Instance.LightSourcePosition = new Vector3(0, 0, newZCoord); //  to be changed
 
-            // TODO: Invalidate and apply new z coord
+            WorkspacePanel.Invalidate();
         }
 
         private void ColorCheckBox_CheckedChanged(object sender, EventArgs e)

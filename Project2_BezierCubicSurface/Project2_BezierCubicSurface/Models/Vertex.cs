@@ -32,7 +32,7 @@ namespace Project2_BicubicBezierSurface.Models
 
             TangentVectorU_BR = MeshProcessor.CalculateTangentU(u, v);
             TangentVectorV_BR = MeshProcessor.CalculateTangentV(u, v);
-            NormalVector_BR = Vector3.Cross(TangentVectorU_BR, TangentVectorV_BR);
+            NormalVector_BR = Vector3.Normalize(Vector3.Cross(TangentVectorU_BR, TangentVectorV_BR));
 
             TangentVectorU_AR = TangentVectorU_BR;
             TangentVectorV_AR = TangentVectorV_BR;

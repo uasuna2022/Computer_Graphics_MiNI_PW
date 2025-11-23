@@ -49,7 +49,7 @@ namespace Project2_BicubicBezierSurface.Algorithms
             float kd, Vector3 normalVector, Vector3 lightVersor, float ks, float m)
         {
             normalVector = Vector3.Normalize(normalVector);
-            
+
             Vector3 R = 2 * Vector3.Dot(normalVector, lightVersor) * normalVector - lightVersor;
             R = Vector3.Normalize(R);            
 

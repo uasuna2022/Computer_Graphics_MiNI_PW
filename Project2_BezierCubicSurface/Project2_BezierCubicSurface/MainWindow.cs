@@ -5,6 +5,7 @@ using System.Numerics;
 using System.Windows.Forms;
 using System.Windows;
 using Project2_BicubicBezierSurface.Helpers;
+using Project2_BicubicBezierSurface.ScanLineWithBucketSort;
 
 namespace Project2_BezierCubicSurface
 {
@@ -77,6 +78,22 @@ namespace Project2_BezierCubicSurface
         private void WorkspacePanel_Paint(object sender, PaintEventArgs e)
         {
             Graphics g = e.Graphics;
+
+            using (FastBitmap fastBitmap = new FastBitmap(WorkspacePanel.Width, WorkspacePanel.Height))
+            {
+                fastBitmap.Lock();
+
+                // Perform Scan-line Filling
+                if (Mesh.Instance.FillTriangles)
+                {
+                    ColorFiller.FillMesh(fastBitmap);
+                }
+
+                fastBitmap.Unlock();
+
+                // Draw the result to the screen (0,0 is Top-Left)
+                e.Graphics.DrawImage(fastBitmap.Bitmap, 0, 0);
+            }
 
             g.ScaleTransform(1, -1);
             g.TranslateTransform(WorkspacePanel.Width / 2, -WorkspacePanel.Height / 2);
@@ -220,6 +237,7 @@ namespace Project2_BezierCubicSurface
             Mesh.Instance.FillTriangles = FillTrianglesCheckBox.Checked;
 
             // TODO: fill the triangles with the given color
+            WorkspacePanel.Invalidate();
         }
 
         private void ZAxisRotationTrackBar_ValueChanged(object sender, EventArgs e)
@@ -336,6 +354,7 @@ namespace Project2_BezierCubicSurface
             int newZCoord = LightSourceDistanceTrackbar.Value;
             LightSourceDistanceLabelValue.Text = newZCoord.ToString();
             Mesh.Instance.SetLightSourceZCoord(newZCoord);
+            Mesh.Instance.LightSourcePosition = new Vector3(0, 0, newZCoord); //  to be changed
 
             // TODO: Invalidate and apply new z coord
         }
@@ -343,6 +362,7 @@ namespace Project2_BezierCubicSurface
         private void ColorCheckBox_CheckedChanged(object sender, EventArgs e)
         {
             // TODO
+            
         }
 
         private void ImageCheckBox_CheckedChanged(object sender, EventArgs e)

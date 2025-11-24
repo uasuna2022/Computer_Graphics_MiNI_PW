@@ -12,6 +12,8 @@ namespace Project2_BicubicBezierSurface.Helpers
     public class FastBitmap : IDisposable
     {
         public Bitmap Bitmap { get; private set; }
+        public float[,] ZBuffer {  get; private set; }  
+
         private BitmapData? _bitmapData;
         private byte[]? _pixels;
         private IntPtr _ptr;
@@ -24,6 +26,15 @@ namespace Project2_BicubicBezierSurface.Helpers
             _width = width;
             _height = height;
             Bitmap = new Bitmap(width, height, PixelFormat.Format32bppArgb);
+
+            ZBuffer = new float[width, height];
+            for (int i = 0; i < width; i++)
+            {
+                for (int j = 0; j < height; j++)
+                {
+                    ZBuffer[i, j] = float.MinValue;
+                }
+            }
         }
 
         public void Lock()

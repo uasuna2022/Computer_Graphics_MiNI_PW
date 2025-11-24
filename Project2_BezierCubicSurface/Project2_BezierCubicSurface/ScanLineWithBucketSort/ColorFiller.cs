@@ -101,72 +101,79 @@ namespace Project2_BicubicBezierSurface.ScanLineWithBucketSort
                         var (alpha, beta, gamma) = LightingCalculator.CalculateBarycentricCoefficients(
                             p1, p2, p3, new Vector2(x, y));
 
-                        // interpolates U and V image (texture) coordinates
-                        float u = v1.U * alpha + v2.U * beta + v3.U * gamma;
-                        float v = v1.V * alpha + v2.V * beta + v3.V * gamma;
-
-                        Vector3 objectColor = Mesh.Instance.SurfaceColor;
-
-                        if (Mesh.Instance.EnableImage && Mesh.Instance.CurrentTexture != null)
+                        float z = p1.Z * alpha + p2.Z * beta + p3.Z * gamma;
+                        if (z > bitmap.ZBuffer[x, y])
                         {
-                            // set color from texture map using interpolated U and V 
-                            objectColor = Mesh.Instance.CurrentTexture.GetColorAtUV(u, v);
+                            bitmap.ZBuffer[x, y] = z;
+
+                            // interpolates U and V image (texture) coordinates
+                            float u = v1.U * alpha + v2.U * beta + v3.U * gamma;
+                            float v = v1.V * alpha + v2.V * beta + v3.V * gamma;
+
+                            Vector3 objectColor = Mesh.Instance.SurfaceColor;
+
+                            if (Mesh.Instance.EnableImage && Mesh.Instance.CurrentTexture != null)
+                            {
+                                // set color from texture map using interpolated U and V 
+                                objectColor = Mesh.Instance.CurrentTexture.GetColorAtUV(u, v);
+                            }
+
+                            Vector3 N_surface = LightingCalculator.InterpolateNormal(
+                                v1.NormalVector_AR, v2.NormalVector_AR, v3.NormalVector_AR,
+                                alpha, beta, gamma);
+
+                            if (N_surface.LengthSquared() < 1e-6)
+                            {
+                                bitmap.SetPixel(x, y, Color.Black);
+                                continue;
+                            }
+
+                            N_surface = Vector3.Normalize(N_surface);
+                            Vector3 N_final;
+
+                            // this section handles the logic of NormalMap usage:
+                            // N_final = M * N_map, where
+                            // M = [P_u, P_v, N_surface]
+                            if (Mesh.Instance.EnableNormalMap && Mesh.Instance.CurrentNormalMap != null)
+                            {
+                                Vector3 Pu = LightingCalculator.InterpolateNormal(v1.TangentVectorU_AR,
+                                    v2.TangentVectorU_AR, v3.TangentVectorU_AR, alpha, beta, gamma);
+                                Vector3 Pv = LightingCalculator.InterpolateNormal(v1.TangentVectorV_AR,
+                                    v2.TangentVectorV_AR, v3.TangentVectorV_AR, alpha, beta, gamma);
+
+                                Pu = Vector3.Normalize(Pu);
+                                Pv = Vector3.Normalize(Pv);
+
+                                Vector3 N_map = Mesh.Instance.CurrentNormalMap.GetNormalFromMap(u, v);
+
+                                N_final.X = Pu.X * N_map.X + Pv.X * N_map.Y + N_surface.X * N_map.Z;
+                                N_final.Y = Pu.Y * N_map.X + Pv.Y * N_map.Y + N_surface.Y * N_map.Z;
+                                N_final.Z = Pu.Z * N_map.X + Pv.Z * N_map.Y + N_surface.Z * N_map.Z;
+
+                                N_final = Vector3.Normalize(N_final);
+                            }
+                            else N_final = N_surface;
+
+                            Vector3 interpolatedPoint = v1.TransformedPosition * alpha +
+                                v2.TransformedPosition * beta + v3.TransformedPosition * gamma;
+
+                            Vector3 lightVersor = LightingCalculator.CalculateLightVersor(
+                                Mesh.Instance.LightSourcePosition, interpolatedPoint);
+
+                            Vector3 finalColor = LightingCalculator.CalculateColorVector(
+                                Mesh.Instance.LightSourceColor,
+                                objectColor,
+                                Mesh.Instance.Kd,
+                                N_final,
+                                lightVersor,
+                                Mesh.Instance.Ks,
+                                Mesh.Instance.M);
+
+                            bitmap.SetPixel(x, y, LightingCalculator.GetRGBColor(finalColor));
                         }
-
-                        Vector3 N_surface = LightingCalculator.InterpolateNormal(
-                            v1.NormalVector_AR, v2.NormalVector_AR, v3.NormalVector_AR,
-                            alpha, beta, gamma);
-
-                        if (N_surface.LengthSquared() < 1e-6)
-                        {
-                            bitmap.SetPixel(x, y, Color.Black);
-                            continue;
-                        }
-
-                        N_surface = Vector3.Normalize(N_surface);
-                        Vector3 N_final;
-
-                        // this section handles the logic of NormalMap usage:
-                        // N_final = M * N_map, where
-                        // M = [P_u, P_v, N_surface]
-                        if (Mesh.Instance.EnableNormalMap && Mesh.Instance.CurrentNormalMap != null)
-                        {
-                            Vector3 Pu = LightingCalculator.InterpolateNormal(v1.TangentVectorU_AR,
-                                v2.TangentVectorU_AR, v3.TangentVectorU_AR, alpha, beta, gamma);
-                            Vector3 Pv = LightingCalculator.InterpolateNormal(v1.TangentVectorV_AR,
-                                v2.TangentVectorV_AR, v3.TangentVectorV_AR, alpha, beta, gamma);
-
-                            Pu = Vector3.Normalize(Pu);
-                            Pv = Vector3.Normalize(Pv);
-
-                            Vector3 N_map = Mesh.Instance.CurrentNormalMap.GetNormalFromMap(u, v);
-
-                            N_final.X = Pu.X * N_map.X + Pv.X * N_map.Y + N_surface.X * N_map.Z;
-                            N_final.Y = Pu.Y * N_map.X + Pv.Y * N_map.Y + N_surface.Y * N_map.Z;
-                            N_final.Z = Pu.Z * N_map.X + Pv.Z * N_map.Y + N_surface.Z * N_map.Z;
-
-                            N_final = Vector3.Normalize(N_final);
-                        }
-                        else N_final = N_surface;
-
-                        Vector3 interpolatedPoint = v1.TransformedPosition * alpha + 
-                            v2.TransformedPosition * beta + v3.TransformedPosition * gamma;
-
-                        Vector3 lightVersor = LightingCalculator.CalculateLightVersor(
-                            Mesh.Instance.LightSourcePosition, interpolatedPoint);
-
-                        Vector3 finalColor = LightingCalculator.CalculateColorVector(
-                            Mesh.Instance.LightSourceColor,
-                            objectColor,
-                            Mesh.Instance.Kd,
-                            N_final,
-                            lightVersor,
-                            Mesh.Instance.Ks,
-                            Mesh.Instance.M);
-
-                        bitmap.SetPixel(x, y, LightingCalculator.GetRGBColor(finalColor));
                     }
                 }
+
                 foreach (var edge in activeEdges) 
                     edge.CurrentX += edge.InverseSlope;
             }

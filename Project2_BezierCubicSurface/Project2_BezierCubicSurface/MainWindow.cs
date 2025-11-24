@@ -111,7 +111,7 @@ namespace Project2_BezierCubicSurface
             {
                 fastBitmap.Lock();
 
-                if (Mesh.Instance.FillTriangles) // TODO: change according to checkboxes
+                if (Mesh.Instance.FillTriangles)
                     ColorFiller.FillMesh(fastBitmap);
 
                 fastBitmap.Unlock();

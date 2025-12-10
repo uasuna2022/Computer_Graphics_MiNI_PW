@@ -1,4 +1,4 @@
-namespace Project3_CustomFunctionImageFilter
+﻿namespace Project3_CustomFunctionImageFilter
 {
     public partial class MainWindow : Form
     {
@@ -88,6 +88,54 @@ namespace Project3_CustomFunctionImageFilter
             EditorWorkspace.Instance.Gamma = value;
             gammaCorrectionValueLabel.Text = value.ToString("F1");
             // TODO: apply changes
+        }
+
+        private void openImageToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            using (OpenFileDialog openFileDialog = new OpenFileDialog())
+            {
+                openFileDialog.Title = "Choose an image";
+                openFileDialog.Filter = "Image Files|*.jpg;*.jpeg;*.png;*.bmp";
+
+                if (openFileDialog.ShowDialog() == DialogResult.OK)
+                {
+                    using (Bitmap tempBitmap = new Bitmap(openFileDialog.FileName))
+                    {
+                        EditorWorkspace.Instance.SetImage(tempBitmap);
+                    }
+
+                    workingPanel.Invalidate();
+                }
+            }
+        }
+
+        private void workingPanel_Paint(object sender, PaintEventArgs e)
+        {
+            if (EditorWorkspace.Instance.WorkingImage == null)
+                return;
+
+            int panelWidth = workingPanel.Width;
+            int panelHeight = workingPanel.Height;  
+            int imageWidth = EditorWorkspace.Instance.WorkingImage.Width;
+            int imageHeight = EditorWorkspace.Instance.WorkingImage.Height;
+
+            float scaleX = (float)panelWidth / imageWidth;
+            float scaleY = (float)panelHeight / imageHeight;
+            float scale = Math.Min(scaleX, scaleY);
+
+            int newWidth = (int)(imageWidth * scale);
+            int newHeight = (int)(imageHeight * scale);
+
+            // Centering
+            int posX = (panelWidth - newWidth) / 2;
+            int posY = (panelHeight - newHeight) / 2;
+
+            // Ustawiamy tryb interpolacji na wysoką jakość, żeby pomniejszony obrazek był ładny
+            //e.Graphics.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic;
+
+            // 4. Rysujemy obraz w wyliczonym prostokącie
+            e.Graphics.DrawImage(EditorWorkspace.Instance.WorkingImage, posX, posY, newWidth, newHeight);
+
         }
     }
 }

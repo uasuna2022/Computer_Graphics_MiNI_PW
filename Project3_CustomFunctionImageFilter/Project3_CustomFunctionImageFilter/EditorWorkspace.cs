@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Drawing;
+using Project3_CustomFunctionImageFilter.Helpers;
 
 namespace Project3_CustomFunctionImageFilter
 {
@@ -45,6 +46,30 @@ namespace Project3_CustomFunctionImageFilter
             OriginalImage?.Dispose();
             WorkingImage?.Dispose();
         }
+        public void CountPixels()
+        {
+            if (WorkingImage == null)
+            {
+                Array.Clear(BlueData, 0, 256);
+                Array.Clear(GreenData, 0, 256);
+                Array.Clear(RedData, 0, 256);
+                return;
+            }
 
+            using (FastBitmap fb = new FastBitmap(WorkingImage))
+            {
+                for (int i = 0; i < WorkingImage.Width; i++)
+                {
+                    for (int j = 0; j < WorkingImage.Height; j++)
+                    {
+                        fb.Lock();
+                        Color c = fb.GetPixel(i, j);
+                        RedData[c.A]++;
+                        GreenData[c.G]++;
+                        BlueData[c.B]++;
+                    }
+                }
+            }
+        }
     }
 }

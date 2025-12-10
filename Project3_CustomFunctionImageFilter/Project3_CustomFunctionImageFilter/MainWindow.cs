@@ -119,6 +119,7 @@
             int imageWidth = EditorWorkspace.Instance.WorkingImage.Width;
             int imageHeight = EditorWorkspace.Instance.WorkingImage.Height;
 
+            // Scaling
             float scaleX = (float)panelWidth / imageWidth;
             float scaleY = (float)panelHeight / imageHeight;
             float scale = Math.Min(scaleX, scaleY);
@@ -130,12 +131,7 @@
             int posX = (panelWidth - newWidth) / 2;
             int posY = (panelHeight - newHeight) / 2;
 
-            // Ustawiamy tryb interpolacji na wysoką jakość, żeby pomniejszony obrazek był ładny
-            //e.Graphics.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic;
-
-            // 4. Rysujemy obraz w wyliczonym prostokącie
             e.Graphics.DrawImage(EditorWorkspace.Instance.WorkingImage, posX, posY, newWidth, newHeight);
-
         }
     }
 }

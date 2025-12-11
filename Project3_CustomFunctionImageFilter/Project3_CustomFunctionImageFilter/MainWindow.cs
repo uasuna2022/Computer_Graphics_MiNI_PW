@@ -39,10 +39,13 @@ namespace Project3_CustomFunctionImageFilter
             UpdateCheckProperties();
             UpdateEnableProperties();
 
-            if (EditorWorkspace.Instance.WholeImage)
+            if (EditorWorkspace.Instance.OriginalImage != null)
             {
-                ImageProcessor.ApplyGlobal(FilterStrategies.GetNoFilter());
-                EditorWorkspace.Instance.CountPixels();
+                EditorWorkspace.Instance.WorkingImage?.Dispose();
+                EditorWorkspace.Instance.WorkingImage = (Bitmap)EditorWorkspace.Instance.OriginalImage.Clone();
+
+                EditorWorkspace.Instance.RestoreHistogramFromOriginal();
+
                 UpdateHistograms();
                 workingPanel.Invalidate();
             }
@@ -247,11 +250,12 @@ namespace Project3_CustomFunctionImageFilter
                 strategy = FilterStrategies.GetCustomFunctionFilter(); // TODO: for sure add appropriate arguments
 
             if (EditorWorkspace.Instance.WholeImage)
+            {
                 ImageProcessor.ApplyGlobal(strategy);
-
-            EditorWorkspace.Instance.CountPixels();
-            UpdateHistograms();
-            workingPanel.Invalidate();
+                EditorWorkspace.Instance.CountPixels();
+                UpdateHistograms();
+                workingPanel.Invalidate();
+            }
         }
         private void saveImageToolStripMenuItem_Click(object sender, EventArgs e)
         {
@@ -300,21 +304,23 @@ namespace Project3_CustomFunctionImageFilter
         private void wholeImageRadioButton_CheckedChanged(object sender, EventArgs e)
         {
             EditorWorkspace.Instance.WholeImage = wholeImageRadioButton.Checked;
-            if (EditorWorkspace.Instance.NoFilter)
+            if (EditorWorkspace.Instance.WholeImage)
             {
                 if (EditorWorkspace.Instance.OriginalImage == null)
                     return;
 
-                EditorWorkspace.Instance.WorkingImage?.Dispose();
-                EditorWorkspace.Instance.WorkingImage = (Bitmap)EditorWorkspace.Instance.OriginalImage.Clone();
+                if (EditorWorkspace.Instance.NoFilter)
+                {
+                    EditorWorkspace.Instance.WorkingImage?.Dispose();
+                    EditorWorkspace.Instance.WorkingImage = (Bitmap)EditorWorkspace.Instance.OriginalImage.Clone();
+                    EditorWorkspace.Instance.RestoreHistogramFromOriginal();
+                    EditorWorkspace.Instance.CountPixels();
 
-                EditorWorkspace.Instance.CountPixels();
-                UpdateHistograms();
-                workingPanel.Invalidate();
-                return;
+                    UpdateHistograms();
+                    workingPanel.Invalidate();
+                }
+                else ApplyCurrentFilter();
             }
-
-            ApplyCurrentFilter();
         }
 
         private void brushRadioButton_CheckedChanged(object sender, EventArgs e)
@@ -330,7 +336,7 @@ namespace Project3_CustomFunctionImageFilter
                 EditorWorkspace.Instance.WorkingImage?.Dispose();
                 EditorWorkspace.Instance.WorkingImage = (Bitmap)EditorWorkspace.Instance.OriginalImage.Clone();
 
-                EditorWorkspace.Instance.CountPixels();
+                EditorWorkspace.Instance.RestoreHistogramFromOriginal();
                 UpdateHistograms();
                 workingPanel.Invalidate();
             }
@@ -406,19 +412,41 @@ namespace Project3_CustomFunctionImageFilter
             if (strategy != null)
             {
                 ImageProcessor.ApplyBrush(imgPoint.Value, strategy);
-                workingPanel.Invalidate();
+
+                float scale = Math.Min((float)workingPanel.ClientSize.Width / EditorWorkspace.Instance.WorkingImage.Width,
+                    (float)workingPanel.ClientSize.Height / EditorWorkspace.Instance.WorkingImage.Height);
+
+                int screenRadius = (int)(EditorWorkspace.Instance.BrushRadius * scale) + 2;
+                int size = screenRadius * 2 + 4;
+
+                Rectangle dirtyRect = new Rectangle(mousePosition.X - screenRadius,
+                    mousePosition.Y - screenRadius, size, size);
+
+                workingPanel.Invalidate(dirtyRect);
             }
         }
         private void workingPanel_MouseMove(object sender, MouseEventArgs e)
         {
+            Point oldPosition = _lastMousePosition;
             _lastMousePosition = e.Location;
 
             if (_isPainting)
                 PerformBrushPainting(e.Location);
 
-            if (EditorWorkspace.Instance.CircleBrush)
-                workingPanel.Invalidate();
+            if (EditorWorkspace.Instance.CircleBrush && EditorWorkspace.Instance.WorkingImage != null)
+            {
+                float scale = Math.Min((float)workingPanel.ClientSize.Width / EditorWorkspace.Instance.WorkingImage.Width,
+                    (float)workingPanel.ClientSize.Height / EditorWorkspace.Instance.WorkingImage.Height);
 
+                int radius = (int)(EditorWorkspace.Instance.BrushRadius * scale) + 2;
+                int size = radius * 2 + 8;
+
+                workingPanel.Invalidate(new Rectangle(oldPosition.X - radius - 2,
+                    oldPosition.Y - radius - 2, size, size));
+
+                workingPanel.Invalidate(new Rectangle(_lastMousePosition.X - radius - 2,
+                    _lastMousePosition.Y - radius - 2, size, size));
+            }
         }
 
         private void workingPanel_MouseDown(object sender, MouseEventArgs e)
@@ -435,7 +463,6 @@ namespace Project3_CustomFunctionImageFilter
             if (_isPainting)
             {
                 _isPainting = false;
-                EditorWorkspace.Instance.CountPixels();
                 UpdateHistograms(); 
             }
         }

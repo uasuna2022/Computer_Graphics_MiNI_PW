@@ -32,6 +32,9 @@ namespace Project3_CustomFunctionImageFilter
         public int[] RedData { get; set; } = new int[256];
         public int[] GreenData { get; set; } = new int[256];
         public int[] BlueData { get; set; } = new int[256];
+        public int[] OriginalRedData { get; set; } = new int[256];
+        public int[] OriginalGreenData { get; set; } = new int[256];
+        public int[] OriginalBlueData { get; set; } = new int[256];
 
         public bool WholeImage { get; set; } = true;
         public bool CircleBrush { get; set; } = false;
@@ -44,6 +47,9 @@ namespace Project3_CustomFunctionImageFilter
 
             OriginalImage = new Bitmap(image);
             WorkingImage = new Bitmap(image);
+
+            CountOriginalPixels();
+            RestoreHistogramFromOriginal();
         }
         public void Dispose()
         {
@@ -73,6 +79,46 @@ namespace Project3_CustomFunctionImageFilter
                     }
                 }
             }
+        }
+        public void UpdatePixelCount(Color oldColor, Color newColor)
+        {
+            RedData[oldColor.R]--;
+            GreenData[oldColor.G]--;
+            BlueData[oldColor.B]--;
+
+            RedData[newColor.R]++;
+            GreenData[newColor.G]++;
+            BlueData[newColor.B]++;
+        }
+        public void CountOriginalPixels()
+        {
+            Array.Clear(OriginalBlueData, 0, 256);
+            Array.Clear(OriginalGreenData, 0, 256);
+            Array.Clear(OriginalRedData, 0, 256);
+
+            if (OriginalImage == null)
+                return;
+
+            using (FastBitmap fb = new FastBitmap(OriginalImage))
+            {
+                fb.Lock();
+                for (int i = 0; i < OriginalImage.Width; i++)
+                {
+                    for (int j = 0; j < OriginalImage.Height; j++)
+                    {
+                        Color c = fb.GetPixel(i, j);
+                        OriginalRedData[c.R]++;
+                        OriginalGreenData[c.G]++;
+                        OriginalBlueData[c.B]++;
+                    }
+                }
+            }  
+        }
+        public void RestoreHistogramFromOriginal()
+        {
+            Array.Copy(OriginalRedData, RedData, 256);
+            Array.Copy(OriginalGreenData, GreenData, 256);
+            Array.Copy(OriginalBlueData, BlueData, 256);
         }
     }
 }

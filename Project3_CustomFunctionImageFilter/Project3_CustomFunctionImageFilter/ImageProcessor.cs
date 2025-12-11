@@ -73,6 +73,8 @@ namespace Project3_CustomFunctionImageFilter
 
                                 Color newColor = Color.FromArgb(oldColor.A, newR, newG, newB);
                                 fb2.SetPixel(i, j, newColor);
+
+                                EditorWorkspace.Instance.UpdatePixelCount(oldColor, newColor);
                             }
                         }
                     }

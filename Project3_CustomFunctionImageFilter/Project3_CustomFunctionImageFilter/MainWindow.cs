@@ -1,4 +1,4 @@
-﻿// using System.Windows.Forms.DataVisualization.Charting;
+﻿using System.Windows.Forms.DataVisualization.Charting;
 
 namespace Project3_CustomFunctionImageFilter
 {
@@ -9,6 +9,7 @@ namespace Project3_CustomFunctionImageFilter
         public MainWindow()
         {
             InitializeComponent();
+            InitializeCharts();
         }
 
         private void UpdateCheckProperties()
@@ -42,6 +43,7 @@ namespace Project3_CustomFunctionImageFilter
             {
                 ImageProcessor.ApplyGlobal(FilterStrategies.GetNoFilter());
                 EditorWorkspace.Instance.CountPixels();
+                UpdateHistograms();
                 workingPanel.Invalidate();
             }
         }
@@ -55,6 +57,7 @@ namespace Project3_CustomFunctionImageFilter
             {
                 ImageProcessor.ApplyGlobal(FilterStrategies.GetNegationFilter());
                 EditorWorkspace.Instance.CountPixels();
+                UpdateHistograms();
                 workingPanel.Invalidate();
             }
         }
@@ -69,6 +72,7 @@ namespace Project3_CustomFunctionImageFilter
             {
                 ImageProcessor.ApplyGlobal(FilterStrategies.GetCustomFunctionFilter()); // TODO: add arguments
                 EditorWorkspace.Instance.CountPixels();
+                UpdateHistograms();
                 workingPanel.Invalidate();
             }
         }
@@ -82,6 +86,7 @@ namespace Project3_CustomFunctionImageFilter
             {
                 ImageProcessor.ApplyGlobal(FilterStrategies.GetBrightnessFilter(EditorWorkspace.Instance.Brightness));
                 EditorWorkspace.Instance.CountPixels();
+                UpdateHistograms();
                 workingPanel.Invalidate();
             }
         }
@@ -95,6 +100,7 @@ namespace Project3_CustomFunctionImageFilter
             {
                 ImageProcessor.ApplyGlobal(FilterStrategies.GetContrastFilter(EditorWorkspace.Instance.Contrast));
                 EditorWorkspace.Instance.CountPixels();
+                UpdateHistograms();
                 workingPanel.Invalidate();
             }
         }
@@ -108,6 +114,7 @@ namespace Project3_CustomFunctionImageFilter
             {
                 ImageProcessor.ApplyGlobal(FilterStrategies.GetGammaFilter(EditorWorkspace.Instance.Gamma));
                 EditorWorkspace.Instance.CountPixels();
+                UpdateHistograms();
                 workingPanel.Invalidate();
             }
         }
@@ -122,6 +129,7 @@ namespace Project3_CustomFunctionImageFilter
             {
                 ImageProcessor.ApplyGlobal(FilterStrategies.GetBrightnessFilter(EditorWorkspace.Instance.Brightness));
                 EditorWorkspace.Instance.CountPixels();
+                UpdateHistograms();
                 workingPanel.Invalidate();
             }
         }
@@ -136,6 +144,7 @@ namespace Project3_CustomFunctionImageFilter
             {
                 ImageProcessor.ApplyGlobal(FilterStrategies.GetContrastFilter(EditorWorkspace.Instance.Contrast));
                 EditorWorkspace.Instance.CountPixels();
+                UpdateHistograms();
                 workingPanel.Invalidate();
             }
         }
@@ -150,6 +159,7 @@ namespace Project3_CustomFunctionImageFilter
             {
                 ImageProcessor.ApplyGlobal(FilterStrategies.GetGammaFilter(EditorWorkspace.Instance.Gamma));
                 EditorWorkspace.Instance.CountPixels();
+                UpdateHistograms();
                 workingPanel.Invalidate();
             }
         }
@@ -185,7 +195,6 @@ namespace Project3_CustomFunctionImageFilter
             int imageWidth = EditorWorkspace.Instance.WorkingImage.Width;
             int imageHeight = EditorWorkspace.Instance.WorkingImage.Height;
 
-            // Scaling
             float scaleX = (float)panelWidth / imageWidth;
             float scaleY = (float)panelHeight / imageHeight;
             float scale = Math.Min(scaleX, scaleY);
@@ -193,7 +202,6 @@ namespace Project3_CustomFunctionImageFilter
             int newWidth = (int)(imageWidth * scale);
             int newHeight = (int)(imageHeight * scale);
 
-            // Centering
             int posX = (panelWidth - newWidth) / 2;
             int posY = (panelHeight - newHeight) / 2;
 
@@ -242,6 +250,7 @@ namespace Project3_CustomFunctionImageFilter
                 ImageProcessor.ApplyGlobal(strategy);
 
             EditorWorkspace.Instance.CountPixels();
+            UpdateHistograms();
             workingPanel.Invalidate();
         }
         private void saveImageToolStripMenuItem_Click(object sender, EventArgs e)
@@ -291,6 +300,20 @@ namespace Project3_CustomFunctionImageFilter
         private void wholeImageRadioButton_CheckedChanged(object sender, EventArgs e)
         {
             EditorWorkspace.Instance.WholeImage = wholeImageRadioButton.Checked;
+            if (EditorWorkspace.Instance.NoFilter)
+            {
+                if (EditorWorkspace.Instance.OriginalImage == null)
+                    return;
+
+                EditorWorkspace.Instance.WorkingImage?.Dispose();
+                EditorWorkspace.Instance.WorkingImage = (Bitmap)EditorWorkspace.Instance.OriginalImage.Clone();
+
+                EditorWorkspace.Instance.CountPixels();
+                UpdateHistograms();
+                workingPanel.Invalidate();
+                return;
+            }
+
             ApplyCurrentFilter();
         }
 
@@ -306,8 +329,9 @@ namespace Project3_CustomFunctionImageFilter
 
                 EditorWorkspace.Instance.WorkingImage?.Dispose();
                 EditorWorkspace.Instance.WorkingImage = (Bitmap)EditorWorkspace.Instance.OriginalImage.Clone();
-                EditorWorkspace.Instance.CountPixels();
 
+                EditorWorkspace.Instance.CountPixels();
+                UpdateHistograms();
                 workingPanel.Invalidate();
             }
         }
@@ -382,7 +406,6 @@ namespace Project3_CustomFunctionImageFilter
             if (strategy != null)
             {
                 ImageProcessor.ApplyBrush(imgPoint.Value, strategy);
-
                 workingPanel.Invalidate();
             }
         }
@@ -413,7 +436,7 @@ namespace Project3_CustomFunctionImageFilter
             {
                 _isPainting = false;
                 EditorWorkspace.Instance.CountPixels();
-                // UpdateHistograms(); 
+                UpdateHistograms(); 
             }
         }
 
@@ -421,6 +444,101 @@ namespace Project3_CustomFunctionImageFilter
         {
             _lastMousePosition = Point.Empty;
             workingPanel.Invalidate();
+        }
+
+        private void ConfigureSingleChart(Chart chart, Color color)
+        {
+            chart.Series.Clear();
+            chart.ChartAreas.Clear();
+            chart.Legends.Clear();
+
+            ChartArea area = new ChartArea("Area1");
+
+            area.AxisX.Minimum = 0;
+            area.AxisX.Maximum = 255;
+            area.AxisX.Interval = 50;
+            area.AxisX.LabelStyle.Enabled = true;
+            area.AxisX.LabelStyle.Font = new Font("Arial", 7F);
+            area.AxisX.LabelStyle.ForeColor = Color.Gray;
+
+            area.AxisX.MajorGrid.LineColor = Color.LightGray;
+            area.AxisX.MajorGrid.LineWidth = 1;
+            area.AxisX.MajorTickMark.Enabled = false;
+
+            area.AxisY.Minimum = 0;
+            area.AxisY.Maximum = 5000;
+            area.AxisY.Interval = 1000;
+            area.AxisY.MajorGrid.LineColor = Color.FromArgb(240, 240, 240);
+            area.AxisY.LineColor = Color.Transparent;
+            area.AxisY.LabelStyle.Font = new Font("Arial", 7F);
+            area.AxisY.LabelStyle.ForeColor = Color.Gray;
+
+            area.Position.Auto = true;
+
+            chart.ChartAreas.Add(area);
+
+            Series series = new Series("Data");
+            series.ChartType = SeriesChartType.Column;
+            series["PointWidth"] = "1";
+            series.Color = color;
+            series.BorderWidth = 0;
+
+            chart.Series.Add(series);
+        }
+        private void InitializeCharts()
+        {
+            ConfigureSingleChart(chartRed, Color.Red);
+            ConfigureSingleChart(chartGreen, Color.Green);
+            ConfigureSingleChart(chartBlue, Color.Blue);
+        }
+        private void UpdateHistograms()
+        {
+            if (EditorWorkspace.Instance.WorkingImage == null)
+                return;
+
+            long totalPixels = (long)(EditorWorkspace.Instance.WorkingImage.Width * 
+                EditorWorkspace.Instance.WorkingImage.Height);
+            int maxPixelCount = (totalPixels < 2000000) ? 5000 : 50000;
+            void AdjustYAxis(Chart chart, int maxVal)
+            {
+                ChartArea area = chart.ChartAreas[0];
+
+                if (area.AxisY.Maximum == maxVal) 
+                    return;
+
+                area.AxisY.Maximum = maxVal;
+                area.AxisY.Interval = maxVal / 5;
+
+                area.AxisY.MajorGrid.LineColor = Color.FromArgb(240, 240, 240);
+                area.AxisY.LineColor = Color.Transparent;
+                area.AxisY.LabelStyle.Font = new Font("Arial", 7F);
+                area.AxisY.LabelStyle.ForeColor = Color.Gray;
+            }
+
+            AdjustYAxis(chartRed, maxPixelCount);
+            AdjustYAxis(chartGreen, maxPixelCount);
+            AdjustYAxis(chartBlue, maxPixelCount);
+
+            void FillData(Chart chart, int[] data)
+            {
+                if (chart.Series.Count > 0)
+                {
+                    chart.Series.SuspendUpdates();
+                    chart.Series["Data"].Points.Clear();
+                    for (int i = 0; i <= 255; i++)
+                    {
+                        int value = Math.Min(maxPixelCount, data[i]);
+                        chart.Series["Data"].Points.AddXY(i, value);
+                    }
+
+                    chart.Series.ResumeUpdates();
+                    chart.Invalidate();
+                }
+            }
+
+            FillData(chartRed, EditorWorkspace.Instance.RedData);
+            FillData(chartGreen, EditorWorkspace.Instance.GreenData);
+            FillData(chartBlue, EditorWorkspace.Instance.BlueData);
         }
     }
 }

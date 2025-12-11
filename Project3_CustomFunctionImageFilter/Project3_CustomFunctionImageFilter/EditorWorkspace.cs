@@ -33,6 +33,10 @@ namespace Project3_CustomFunctionImageFilter
         public int[] GreenData { get; set; } = new int[256];
         public int[] BlueData { get; set; } = new int[256];
 
+        public bool WholeImage { get; set; } = true;
+        public bool CircleBrush { get; set; } = false;
+        public int BrushRadius { get; set; } = 20;
+
         public void SetImage(Bitmap image)
         {
             OriginalImage?.Dispose();
@@ -48,23 +52,22 @@ namespace Project3_CustomFunctionImageFilter
         }
         public void CountPixels()
         {
+            Array.Clear(BlueData, 0, 256);
+            Array.Clear(GreenData, 0, 256);
+            Array.Clear(RedData, 0, 256);
+
             if (WorkingImage == null)
-            {
-                Array.Clear(BlueData, 0, 256);
-                Array.Clear(GreenData, 0, 256);
-                Array.Clear(RedData, 0, 256);
                 return;
-            }
 
             using (FastBitmap fb = new FastBitmap(WorkingImage))
             {
+                fb.Lock();
                 for (int i = 0; i < WorkingImage.Width; i++)
                 {
                     for (int j = 0; j < WorkingImage.Height; j++)
                     {
-                        fb.Lock();
                         Color c = fb.GetPixel(i, j);
-                        RedData[c.A]++;
+                        RedData[c.R]++;
                         GreenData[c.G]++;
                         BlueData[c.B]++;
                     }

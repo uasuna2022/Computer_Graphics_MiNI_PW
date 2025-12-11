@@ -1,4 +1,6 @@
-﻿namespace Project3_CustomFunctionImageFilter
+﻿// using System.Windows.Forms.DataVisualization.Charting;
+
+namespace Project3_CustomFunctionImageFilter
 {
     public partial class MainWindow : Form
     {
@@ -25,7 +27,8 @@
             bool hasImage = (EditorWorkspace.Instance.WorkingImage != null) ? true : false;
             brightnessFilterRadioButton.Enabled = contrastFilterRadioButton.Enabled =
                 customFunctionRadioButton.Enabled = gammaCorrectionFilterRadioButton.Enabled =
-                noFilterRadioButton.Enabled = negationFilterRadioButton.Enabled = hasImage;
+                noFilterRadioButton.Enabled = negationFilterRadioButton.Enabled =
+                wholeImageRadioButton.Enabled = brushRadioButton.Enabled = hasImage;
         }
 
         private void noFilterRadioButton_CheckedChanged(object sender, EventArgs e)
@@ -207,7 +210,7 @@
         {
             if (EditorWorkspace.Instance.WorkingImage == null)
                 return;
-            
+
 
             using (SaveFileDialog saveFileDialog = new SaveFileDialog())
             {
@@ -245,6 +248,35 @@
                     }
                 }
             }
+        }
+
+        private void wholeImageRadioButton_CheckedChanged(object sender, EventArgs e)
+        {
+            EditorWorkspace.Instance.WholeImage = wholeImageRadioButton.Checked;
+            ApplyCurrentFilter();
+        }
+
+        private void brushRadioButton_CheckedChanged(object sender, EventArgs e)
+        {
+            EditorWorkspace.Instance.CircleBrush = brushRadioButton.Checked;
+            brushNumericUpDown.Enabled = brushRadioButton.Checked;
+            
+            if (EditorWorkspace.Instance.CircleBrush)
+            {
+                if (EditorWorkspace.Instance.OriginalImage == null)
+                    return;
+
+                EditorWorkspace.Instance.WorkingImage?.Dispose();
+                EditorWorkspace.Instance.WorkingImage = (Bitmap)EditorWorkspace.Instance.OriginalImage.Clone();
+                EditorWorkspace.Instance.CountPixels();
+
+                workingPanel.Invalidate();
+            }
+        }
+
+        private void brushNumericUpDown_ValueChanged(object sender, EventArgs e)
+        {
+            EditorWorkspace.Instance.BrushRadius = (int)brushNumericUpDown.Value;
         }
     }
 }

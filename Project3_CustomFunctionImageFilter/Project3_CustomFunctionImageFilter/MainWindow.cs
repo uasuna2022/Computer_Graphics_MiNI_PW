@@ -4,6 +4,8 @@ namespace Project3_CustomFunctionImageFilter
 {
     public partial class MainWindow : Form
     {
+        private bool _isPainting = false;
+        private Point _lastMousePosition = Point.Empty;
         public MainWindow()
         {
             InitializeComponent();
@@ -36,10 +38,12 @@ namespace Project3_CustomFunctionImageFilter
             UpdateCheckProperties();
             UpdateEnableProperties();
 
-            // TODO: now it's hardcoded to apply global all time
-            ImageProcessor.ApplyGlobal(FilterStrategies.GetNoFilter());
-            EditorWorkspace.Instance.CountPixels();
-            workingPanel.Invalidate();
+            if (EditorWorkspace.Instance.WholeImage)
+            {
+                ImageProcessor.ApplyGlobal(FilterStrategies.GetNoFilter());
+                EditorWorkspace.Instance.CountPixels();
+                workingPanel.Invalidate();
+            }
         }
 
         private void negationFilterRadioButton_CheckedChanged(object sender, EventArgs e)
@@ -47,10 +51,12 @@ namespace Project3_CustomFunctionImageFilter
             UpdateCheckProperties();
             UpdateEnableProperties();
 
-            // TODO: now it's hardcoded to apply global all time
-            ImageProcessor.ApplyGlobal(FilterStrategies.GetNegationFilter());
-            EditorWorkspace.Instance.CountPixels();
-            workingPanel.Invalidate();
+            if (EditorWorkspace.Instance.WholeImage)
+            {
+                ImageProcessor.ApplyGlobal(FilterStrategies.GetNegationFilter());
+                EditorWorkspace.Instance.CountPixels();
+                workingPanel.Invalidate();
+            }
         }
 
         private void customFunctionRadioButton_CheckedChanged(object sender, EventArgs e)
@@ -59,10 +65,12 @@ namespace Project3_CustomFunctionImageFilter
             UpdateEnableProperties();
             // TODO: if checked, open a helper window to define a function
 
-            // TODO: now it's hardcoded to apply global all time
-            ImageProcessor.ApplyGlobal(FilterStrategies.GetCustomFunctionFilter()); // TODO: add arguments
-            EditorWorkspace.Instance.CountPixels();
-            workingPanel.Invalidate();
+            if (EditorWorkspace.Instance.WholeImage)
+            {
+                ImageProcessor.ApplyGlobal(FilterStrategies.GetCustomFunctionFilter()); // TODO: add arguments
+                EditorWorkspace.Instance.CountPixels();
+                workingPanel.Invalidate();
+            }
         }
 
         private void brightnessFilterRadioButton_CheckedChanged(object sender, EventArgs e)
@@ -70,10 +78,12 @@ namespace Project3_CustomFunctionImageFilter
             UpdateCheckProperties();
             UpdateEnableProperties();
 
-            // TODO: now it's hardcoded to apply global all time
-            ImageProcessor.ApplyGlobal(FilterStrategies.GetBrightnessFilter(EditorWorkspace.Instance.Brightness));
-            EditorWorkspace.Instance.CountPixels();
-            workingPanel.Invalidate();
+            if (EditorWorkspace.Instance.WholeImage)
+            {
+                ImageProcessor.ApplyGlobal(FilterStrategies.GetBrightnessFilter(EditorWorkspace.Instance.Brightness));
+                EditorWorkspace.Instance.CountPixels();
+                workingPanel.Invalidate();
+            }
         }
 
         private void contrastFilterRadioButton_CheckedChanged(object sender, EventArgs e)
@@ -81,10 +91,12 @@ namespace Project3_CustomFunctionImageFilter
             UpdateCheckProperties();
             UpdateEnableProperties();
 
-            // TODO: now it's hardcoded to apply global all time
-            ImageProcessor.ApplyGlobal(FilterStrategies.GetContrastFilter(EditorWorkspace.Instance.Contrast));
-            EditorWorkspace.Instance.CountPixels();
-            workingPanel.Invalidate();
+            if (EditorWorkspace.Instance.WholeImage)
+            {
+                ImageProcessor.ApplyGlobal(FilterStrategies.GetContrastFilter(EditorWorkspace.Instance.Contrast));
+                EditorWorkspace.Instance.CountPixels();
+                workingPanel.Invalidate();
+            }
         }
 
         private void gammaCorrectionFilterRadioButton_CheckedChanged(object sender, EventArgs e)
@@ -92,10 +104,12 @@ namespace Project3_CustomFunctionImageFilter
             UpdateCheckProperties();
             UpdateEnableProperties();
 
-            // TODO: now it's hardcoded to apply global all time
-            ImageProcessor.ApplyGlobal(FilterStrategies.GetGammaFilter(EditorWorkspace.Instance.Gamma));
-            EditorWorkspace.Instance.CountPixels();
-            workingPanel.Invalidate();
+            if (EditorWorkspace.Instance.WholeImage)
+            {
+                ImageProcessor.ApplyGlobal(FilterStrategies.GetGammaFilter(EditorWorkspace.Instance.Gamma));
+                EditorWorkspace.Instance.CountPixels();
+                workingPanel.Invalidate();
+            }
         }
 
         private void brightnessFilterTrackBar_Scroll(object sender, EventArgs e)
@@ -104,10 +118,12 @@ namespace Project3_CustomFunctionImageFilter
             EditorWorkspace.Instance.Brightness = value;
             brightnessValueLabel.Text = value.ToString();
 
-            // TODO: now it's hardcoded to apply global all time
-            ImageProcessor.ApplyGlobal(FilterStrategies.GetBrightnessFilter(EditorWorkspace.Instance.Brightness));
-            EditorWorkspace.Instance.CountPixels();
-            workingPanel.Invalidate();
+            if (EditorWorkspace.Instance.WholeImage)
+            {
+                ImageProcessor.ApplyGlobal(FilterStrategies.GetBrightnessFilter(EditorWorkspace.Instance.Brightness));
+                EditorWorkspace.Instance.CountPixels();
+                workingPanel.Invalidate();
+            }
         }
 
         private void contrastFilterTrackBar_Scroll(object sender, EventArgs e)
@@ -116,10 +132,12 @@ namespace Project3_CustomFunctionImageFilter
             EditorWorkspace.Instance.Contrast = value;
             contrastValueLabel.Text = value.ToString();
 
-            // TODO: now it's hardcoded to apply global all time
-            ImageProcessor.ApplyGlobal(FilterStrategies.GetContrastFilter(EditorWorkspace.Instance.Contrast));
-            EditorWorkspace.Instance.CountPixels();
-            workingPanel.Invalidate();
+            if (EditorWorkspace.Instance.WholeImage)
+            {
+                ImageProcessor.ApplyGlobal(FilterStrategies.GetContrastFilter(EditorWorkspace.Instance.Contrast));
+                EditorWorkspace.Instance.CountPixels();
+                workingPanel.Invalidate();
+            }
         }
 
         private void gammaCorrectionFilterTrackBar_Scroll(object sender, EventArgs e)
@@ -128,10 +146,12 @@ namespace Project3_CustomFunctionImageFilter
             EditorWorkspace.Instance.Gamma = value;
             gammaCorrectionValueLabel.Text = value.ToString("F1");
 
-            // TODO: now it's hardcoded to apply global all time
-            ImageProcessor.ApplyGlobal(FilterStrategies.GetGammaFilter(EditorWorkspace.Instance.Gamma));
-            EditorWorkspace.Instance.CountPixels();
-            workingPanel.Invalidate();
+            if (EditorWorkspace.Instance.WholeImage)
+            {
+                ImageProcessor.ApplyGlobal(FilterStrategies.GetGammaFilter(EditorWorkspace.Instance.Gamma));
+                EditorWorkspace.Instance.CountPixels();
+                workingPanel.Invalidate();
+            }
         }
 
         private void openImageToolStripMenuItem_Click(object sender, EventArgs e)
@@ -160,8 +180,8 @@ namespace Project3_CustomFunctionImageFilter
             if (EditorWorkspace.Instance.WorkingImage == null)
                 return;
 
-            int panelWidth = workingPanel.Width;
-            int panelHeight = workingPanel.Height;
+            int panelWidth = workingPanel.ClientSize.Width;
+            int panelHeight = workingPanel.ClientSize.Height;
             int imageWidth = EditorWorkspace.Instance.WorkingImage.Width;
             int imageHeight = EditorWorkspace.Instance.WorkingImage.Height;
 
@@ -177,7 +197,25 @@ namespace Project3_CustomFunctionImageFilter
             int posX = (panelWidth - newWidth) / 2;
             int posY = (panelHeight - newHeight) / 2;
 
+            e.Graphics.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.NearestNeighbor;
             e.Graphics.DrawImage(EditorWorkspace.Instance.WorkingImage, posX, posY, newWidth, newHeight);
+
+            if (EditorWorkspace.Instance.CircleBrush && EditorWorkspace.Instance.WorkingImage != null &&
+                !_lastMousePosition.IsEmpty)
+            {
+                float screenRadius = EditorWorkspace.Instance.BrushRadius * scale;
+
+                float cx = _lastMousePosition.X;
+                float cy = _lastMousePosition.Y;
+
+                Color penColor = _isPainting ? Color.LimeGreen : Color.Red;
+
+                using (Pen pen = new Pen(penColor, 2))
+                {
+                    pen.DashStyle = System.Drawing.Drawing2D.DashStyle.Dot;
+                    e.Graphics.DrawEllipse(pen, cx - screenRadius, cy - screenRadius, screenRadius * 2, screenRadius * 2);
+                }
+            }
         }
 
         private void ApplyCurrentFilter()
@@ -200,8 +238,8 @@ namespace Project3_CustomFunctionImageFilter
             else if (EditorWorkspace.Instance.CustomFunctionFilter)
                 strategy = FilterStrategies.GetCustomFunctionFilter(); // TODO: for sure add appropriate arguments
 
-            // if (radiobutton "Full image" chosen)
-            ImageProcessor.ApplyGlobal(strategy);
+            if (EditorWorkspace.Instance.WholeImage)
+                ImageProcessor.ApplyGlobal(strategy);
 
             EditorWorkspace.Instance.CountPixels();
             workingPanel.Invalidate();
@@ -260,7 +298,7 @@ namespace Project3_CustomFunctionImageFilter
         {
             EditorWorkspace.Instance.CircleBrush = brushRadioButton.Checked;
             brushNumericUpDown.Enabled = brushRadioButton.Checked;
-            
+
             if (EditorWorkspace.Instance.CircleBrush)
             {
                 if (EditorWorkspace.Instance.OriginalImage == null)
@@ -277,6 +315,112 @@ namespace Project3_CustomFunctionImageFilter
         private void brushNumericUpDown_ValueChanged(object sender, EventArgs e)
         {
             EditorWorkspace.Instance.BrushRadius = (int)brushNumericUpDown.Value;
+        }
+        private Point? GetImageCoordinates(Point mousePosition)
+        {
+            if (EditorWorkspace.Instance.WorkingImage == null)
+                return null;
+
+            int mouseX = mousePosition.X;
+            int mouseY = mousePosition.Y;
+
+            int panelWidth = workingPanel.ClientSize.Width;
+            int panelHeight = workingPanel.ClientSize.Height;
+            int imageWidth = EditorWorkspace.Instance.WorkingImage.Width;
+            int imageHeight = EditorWorkspace.Instance.WorkingImage.Height;
+
+            float scaleX = (float)panelWidth / imageWidth;
+            float scaleY = (float)panelHeight / imageHeight;
+            float scale = Math.Min(scaleX, scaleY);
+
+            int newWidth = (int)(imageWidth * scale);
+            int newHeight = (int)(imageHeight * scale);
+
+            int startX = (panelWidth - newWidth) / 2;
+            int startY = (panelHeight - newHeight) / 2;
+
+            if (mouseX < startX || mouseX >= startX + newWidth || mouseY < startY || mouseY >= startY + newHeight)
+                return null;
+
+            int imageX = (int)((mouseX - startX) / scale);
+            int imageY = (int)((mouseY - startY) / scale);
+
+            if (imageX < 0)
+                imageX = 0;
+            if (imageX >= imageWidth)
+                imageX = imageWidth - 1;
+            if (imageY < 0)
+                imageY = 0;
+            if (imageY >= imageHeight)
+                imageY = imageHeight - 1;
+
+            return new Point(imageX, imageY);
+        }
+        private void PerformBrushPainting(Point mousePosition)
+        {
+            if (!EditorWorkspace.Instance.CircleBrush || EditorWorkspace.Instance.WorkingImage == null)
+                return;
+
+            Point? imgPoint = GetImageCoordinates(mousePosition);
+            if (imgPoint == null)
+                return;
+
+            PixelProcessor? strategy = null;
+
+            if (EditorWorkspace.Instance.NoFilter) strategy = FilterStrategies.GetNoFilter();
+            else if (EditorWorkspace.Instance.NegationFilter)
+                strategy = FilterStrategies.GetNegationFilter();
+            else if (EditorWorkspace.Instance.BrightnessFilter)
+                strategy = FilterStrategies.GetBrightnessFilter(EditorWorkspace.Instance.Brightness);
+            else if (EditorWorkspace.Instance.ContrastFilter)
+                strategy = FilterStrategies.GetContrastFilter(EditorWorkspace.Instance.Contrast);
+            else if (EditorWorkspace.Instance.GammaFilter)
+                strategy = FilterStrategies.GetGammaFilter(EditorWorkspace.Instance.Gamma);
+            else if (EditorWorkspace.Instance.CustomFunctionFilter)
+                strategy = FilterStrategies.GetCustomFunctionFilter();
+
+            if (strategy != null)
+            {
+                ImageProcessor.ApplyBrush(imgPoint.Value, strategy);
+
+                workingPanel.Invalidate();
+            }
+        }
+        private void workingPanel_MouseMove(object sender, MouseEventArgs e)
+        {
+            _lastMousePosition = e.Location;
+
+            if (_isPainting)
+                PerformBrushPainting(e.Location);
+
+            if (EditorWorkspace.Instance.CircleBrush)
+                workingPanel.Invalidate();
+
+        }
+
+        private void workingPanel_MouseDown(object sender, MouseEventArgs e)
+        {
+            if (e.Button == MouseButtons.Left && EditorWorkspace.Instance.CircleBrush)
+            {
+                _isPainting = true;
+                PerformBrushPainting(e.Location);
+            }
+        }
+
+        private void workingPanel_MouseUp(object sender, MouseEventArgs e)
+        {
+            if (_isPainting)
+            {
+                _isPainting = false;
+                EditorWorkspace.Instance.CountPixels();
+                // UpdateHistograms(); 
+            }
+        }
+
+        private void workingPanel_MouseLeave(object sender, EventArgs e)
+        {
+            _lastMousePosition = Point.Empty;
+            workingPanel.Invalidate();
         }
     }
 }

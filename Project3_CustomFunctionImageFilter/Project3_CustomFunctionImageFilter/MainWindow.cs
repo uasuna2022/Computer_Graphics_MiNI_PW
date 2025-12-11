@@ -147,6 +147,7 @@
 
                     UpdateEnableProperties();
                     ApplyCurrentFilter();
+                    saveImageToolStripMenuItem.Enabled = true;
                 }
             }
         }
@@ -202,14 +203,11 @@
             EditorWorkspace.Instance.CountPixels();
             workingPanel.Invalidate();
         }
-
         private void saveImageToolStripMenuItem_Click(object sender, EventArgs e)
         {
             if (EditorWorkspace.Instance.WorkingImage == null)
-            {
-                MessageBox.Show("No image to save!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
-            }
+            
 
             using (SaveFileDialog saveFileDialog = new SaveFileDialog())
             {

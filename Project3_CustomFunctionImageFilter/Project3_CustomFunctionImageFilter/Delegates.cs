@@ -6,5 +6,5 @@ using System.Threading.Tasks;
 
 namespace Project3_CustomFunctionImageFilter
 {
-    public delegate (byte oldR, byte oldG, byte oldB) PixelProcessor(byte newR, byte newG, byte newB);
+    public delegate (byte newR, byte newG, byte newB) PixelProcessor(byte oldR, byte oldG, byte oldB);
 }

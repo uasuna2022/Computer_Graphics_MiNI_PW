@@ -85,6 +85,7 @@ namespace Project2_BezierCubicSurface
                         ColorCheckBox.Checked = false;
                         AnimationCheckBox.Checked = false;
                         LightSourceDistanceTrackbar.Value = 100;
+                        ShowControlPointsCheckBox.Checked = true;
                         Mesh.Instance.SetLightSourceColor(new Vector3(1.0F, 1.0F, 192.0F / 255.0F));
                         Mesh.Instance.SetSurfaceColor(new Vector3(192.0F / 255.0F, 1.0F, 192.0F / 255.0F));
                         WorkspacePanel.Invalidate();

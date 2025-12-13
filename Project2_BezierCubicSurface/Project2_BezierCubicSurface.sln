@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.9.34723.18
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Project2_BezierCubicSurface", "Project2_BezierCubicSurface\Project2_BezierCubicSurface.csproj", "{4BE75E25-30A3-4750-9FB8-2721F4983ADB}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Project2_BicubicBezierSurface", "Project2_BezierCubicSurface\Project2_BicubicBezierSurface.csproj", "{4BE75E25-30A3-4750-9FB8-2721F4983ADB}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

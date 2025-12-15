@@ -29,7 +29,7 @@ namespace Project3_CustomFunctionImageFilter
 
             bool hasImage = (EditorWorkspace.Instance.WorkingImage != null) ? true : false;
             brightnessFilterRadioButton.Enabled = contrastFilterRadioButton.Enabled =
-                customFunctionRadioButton.Enabled = gammaCorrectionFilterRadioButton.Enabled =
+                gammaCorrectionFilterRadioButton.Enabled =
                 noFilterRadioButton.Enabled = negationFilterRadioButton.Enabled =
                 wholeImageRadioButton.Enabled = brushRadioButton.Enabled = hasImage;
         }
@@ -463,7 +463,7 @@ namespace Project3_CustomFunctionImageFilter
             if (_isPainting)
             {
                 _isPainting = false;
-                UpdateHistograms(); 
+                UpdateHistograms();
             }
         }
 
@@ -523,14 +523,14 @@ namespace Project3_CustomFunctionImageFilter
             if (EditorWorkspace.Instance.WorkingImage == null)
                 return;
 
-            long totalPixels = (long)(EditorWorkspace.Instance.WorkingImage.Width * 
+            long totalPixels = (long)(EditorWorkspace.Instance.WorkingImage.Width *
                 EditorWorkspace.Instance.WorkingImage.Height);
             int maxPixelCount = (totalPixels < 2000000) ? 5000 : 50000;
             void AdjustYAxis(Chart chart, int maxVal)
             {
                 ChartArea area = chart.ChartAreas[0];
 
-                if (area.AxisY.Maximum == maxVal) 
+                if (area.AxisY.Maximum == maxVal)
                     return;
 
                 area.AxisY.Maximum = maxVal;
@@ -566,6 +566,17 @@ namespace Project3_CustomFunctionImageFilter
             FillData(chartRed, EditorWorkspace.Instance.RedData);
             FillData(chartGreen, EditorWorkspace.Instance.GreenData);
             FillData(chartBlue, EditorWorkspace.Instance.BlueData);
+        }
+
+        private void exitToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            EditorWorkspace.Instance.Dispose();
+            Application.Exit();
+        }
+
+        private void aboutToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            MessageBox.Show("Image Filter");
         }
     }
 }

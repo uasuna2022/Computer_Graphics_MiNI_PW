@@ -2,12 +2,70 @@
 #include <GLFW/glfw3.h>
 
 #include <iostream>
+#include <vector>
+#include <cmath>
 #include "config.h"
 #include "shaders.h"
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
+
+const float PI = 3.14159265358979323846F;
+
+void generateTorus(std::vector<float>& vertices, std::vector<unsigned int>& indices,
+	float mainRadius, float tubeRadius,
+	int mainSegments, int tubeSegments) {
+
+	// Firstly we generate vertices and colors
+	for (int i = 0; i <= mainSegments; i++) {
+		float theta = (float)i / mainSegments * 2.0f * PI; 
+		float cosTheta = cos(theta);
+		float sinTheta = sin(theta);
+
+		for (int j = 0; j <= tubeSegments; j++) {
+			float phi = (float)j / tubeSegments * 2.0f * PI;
+			float cosPhi = cos(phi);
+			float sinPhi = sin(phi);
+
+			float x = (mainRadius + tubeRadius * cosPhi) * cosTheta;
+			float y = (mainRadius + tubeRadius * cosPhi) * sinTheta;
+			float z = tubeRadius * sinPhi;
+
+			// Pushing position (x,y,z)
+			vertices.push_back(x);
+			vertices.push_back(y);
+			vertices.push_back(z);
+
+			// PUshing color (mapped to [0,1] range)
+			vertices.push_back(0.5f + 0.5f * cosTheta); 
+			vertices.push_back(0.5f + 0.5f * cosPhi);   
+			vertices.push_back(0.5f + 0.5f * sinTheta); 
+		}
+	}
+
+	// Then we generate indices
+	for (int i = 0; i < mainSegments; i++) {
+		for (int j = 0; j < tubeSegments; j++) {
+			int currentRow = i * (tubeSegments + 1);
+			int nextRow = (i + 1) * (tubeSegments + 1);
+
+			int p1 = currentRow + j;
+			int p2 = nextRow + j;
+			int p3 = nextRow + j + 1;
+			int p4 = currentRow + j + 1;
+
+			// Generating two triangles for each quad on the torus surface
+			indices.push_back(p1);
+			indices.push_back(p2);
+			indices.push_back(p4);
+
+			indices.push_back(p2);
+			indices.push_back(p3);
+			indices.push_back(p4);
+		}
+	}
+}
 
 int main()
 {
@@ -51,6 +109,8 @@ int main()
 	glDeleteShader(vertexShader);
 	glDeleteShader(fragmentShader);
 
+
+	// Tetraid generation
 	float vertices1[] = {
 		// positions           // colors
 		1.0f,  1.0f,  1.0f,    1.0f, 0.0f, 0.0f, // v0 - red
@@ -87,6 +147,63 @@ int main()
 
 	glBindVertexArray(0);
 
+	
+	// Torus1 generation 
+	
+	std::vector<float> torusVertices;
+	std::vector<unsigned int> torusIndices;
+
+	
+	generateTorus(torusVertices, torusIndices, 1.0f, 0.2f, 50, 30);
+
+	unsigned int VBO_Torus, VAO_Torus, EBO_Torus;
+	glGenVertexArrays(1, &VAO_Torus);
+	glGenBuffers(1, &VBO_Torus);
+	glGenBuffers(1, &EBO_Torus);
+
+	glBindVertexArray(VAO_Torus);
+
+	glBindBuffer(GL_ARRAY_BUFFER, VBO_Torus);
+	glBufferData(GL_ARRAY_BUFFER, torusVertices.size() * sizeof(float), torusVertices.data(), GL_STATIC_DRAW);
+
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO_Torus);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, torusIndices.size() * sizeof(unsigned int), torusIndices.data(), GL_STATIC_DRAW);
+
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
+	glEnableVertexAttribArray(1);
+
+	glBindVertexArray(0);
+
+	// Torus2 generation 
+
+	std::vector<float> torusVertices2;
+	std::vector<unsigned int> torusIndices2;
+
+
+	generateTorus(torusVertices2, torusIndices2, 1.0f, 0.2f, 50, 30);
+
+	unsigned int VBO_Torus2, VAO_Torus2, EBO_Torus2;
+	glGenVertexArrays(1, &VAO_Torus2);
+	glGenBuffers(1, &VBO_Torus2);
+	glGenBuffers(1, &EBO_Torus2);
+
+	glBindVertexArray(VAO_Torus2);
+
+	glBindBuffer(GL_ARRAY_BUFFER, VBO_Torus2);
+	glBufferData(GL_ARRAY_BUFFER, torusVertices2.size() * sizeof(float), torusVertices2.data(), GL_STATIC_DRAW);
+
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO_Torus2);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, torusIndices2.size() * sizeof(unsigned int), torusIndices2.data(), GL_STATIC_DRAW);
+
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
+	glEnableVertexAttribArray(1);
+
+	glBindVertexArray(0);
+
 
 	while (!glfwWindowShouldClose(window))
 	{
@@ -97,22 +214,56 @@ int main()
 
 		glm::mat4 projection = glm::perspective(glm::radians(45.0f), (float)SCREEN_WIDTH / (float)SCREEN_HEIGHT, 0.1f, 100.0f);
 
-		glm::mat4 view = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -5.0f));
-
-		glm::mat4 model = glm::mat4(1.0f);
-		float angle = (float)glfwGetTime() * 50.0f; 
-		model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 1.0f, 0.0f));
+		glm::mat4 view = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -6.0f));
 
 		int modelLoc = glGetUniformLocation(shaderProgram, "model");
 		int viewLoc = glGetUniformLocation(shaderProgram, "view");
 		int projLoc = glGetUniformLocation(shaderProgram, "projection");
 
-		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
 		glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
 		glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(projection));
 
+
+		float time = (float)glfwGetTime();
+
+		// Tetrahedron logic
+		glm::mat4 modelTetra = glm::mat4(1.0f);
+
+		modelTetra = glm::rotate(modelTetra, time * 1.5f, glm::vec3(1.0f, 1.0f, 0.0f));
+
+		modelTetra = glm::scale(modelTetra, glm::vec3(0.85f));
+
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(modelTetra));
+
 		glBindVertexArray(VAO1);
 		glDrawElements(GL_TRIANGLES, 12, GL_UNSIGNED_INT, 0);
+
+
+		// Torus1 logic
+		glm::mat4 modelTorus = glm::mat4(1.0f);
+
+		modelTorus = glm::rotate(modelTorus, -time * 0.8f, glm::vec3(0.0f, 1.0f, 1.0f));
+
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(modelTorus));
+
+		glBindVertexArray(VAO_Torus);
+		glDrawElements(GL_TRIANGLES, static_cast<unsigned int>(torusIndices.size()), GL_UNSIGNED_INT, 0);
+
+		// Torus2 logic
+		glm::mat4 modelTorus2 = glm::mat4(1.0f);
+
+		modelTorus2 = glm::translate(modelTorus2, glm::vec3(1.0f, 0.0f, 0.0f)); // tiny translation to the right
+
+		modelTorus2 = glm::rotate(modelTorus2, glm::radians(90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+
+		modelTorus2 = glm::rotate(modelTorus2, time * 1.0f, glm::vec3(0.0f, 1.0f, 0.0f));
+
+		modelTorus2 = glm::scale(modelTorus2, glm::vec3(1.2f)); // scalability
+
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(modelTorus2));
+
+		glBindVertexArray(VAO_Torus2);
+		glDrawElements(GL_TRIANGLES, static_cast<unsigned int>(torusIndices2.size()), GL_UNSIGNED_INT, 0);
 
 		glfwSwapBuffers(window);
 		glfwPollEvents();
@@ -121,6 +272,11 @@ int main()
 	glDeleteVertexArrays(1, &VAO1);
 	glDeleteBuffers(1, &VBO1);
 	glDeleteBuffers(1, &EBO1);
+
+	glDeleteVertexArrays(1, &VAO_Torus);
+	glDeleteBuffers(1, &VBO_Torus);
+	glDeleteBuffers(1, &EBO_Torus);
+
 	glDeleteProgram(shaderProgram);
 
 	glfwTerminate();

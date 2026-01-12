@@ -62,5 +62,9 @@ const char* fragmentShaderSource = R"(
 
 			FragColor = vec4(result, 1.0f);
 		}
+		else if (renderMode == 2)
+        {
+             FragColor = vec4(1.0f, 1.0f, 1.0f, 1.0f); // For light source
+        }
 	}
 )";

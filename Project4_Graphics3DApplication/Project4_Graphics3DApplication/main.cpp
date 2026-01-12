@@ -241,11 +241,20 @@ int main()
 		glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
 		glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(projection));
 
-		glUniform3f(lightPosLoc, 2.0f, 2.0f, 5.0f); 
 		glUniform3f(viewPosLoc, 0.0f, 0.0f, 7.0f);    
 
 
 		float time = (float)glfwGetTime();
+
+		// Light position animation
+		float lightRadius = 4.0f;
+		float lightSpeed = 0.8f;
+
+		float lightX = sin(time * lightSpeed) * lightRadius;
+		float lightZ = cos(time * lightSpeed) * lightRadius;
+		float lightY = 1.0f;
+
+		glUniform3f(lightPosLoc, lightX, lightY, lightZ);
 
 		// Tetrahedron rendering
 		glUniform1i(renderModeLoc, 0);
@@ -290,6 +299,19 @@ int main()
 		glBindVertexArray(VAO_Torus2);
 		glDrawElements(GL_TRIANGLES, static_cast<unsigned int>(torusIndices2.size()), GL_UNSIGNED_INT, 0);
 
+
+		// Light source rendering 
+		glUniform1i(renderModeLoc, 2);
+
+		glm::mat4 modelLight = glm::mat4(1.0f);
+
+		modelLight = glm::translate(modelLight, glm::vec3(lightX, lightY, lightZ));
+		modelLight = glm::scale(modelLight, glm::vec3(0.02f));
+
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(modelLight));
+
+		glBindVertexArray(VAO1);
+		glDrawElements(GL_TRIANGLES, 12, GL_UNSIGNED_INT, 0);
 
 		glfwSwapBuffers(window);
 		glfwPollEvents();

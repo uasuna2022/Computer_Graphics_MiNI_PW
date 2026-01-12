@@ -32,6 +32,12 @@ void generateTorus(std::vector<float>& vertices, std::vector<unsigned int>& indi
 			float y = (mainRadius + tubeRadius * cosPhi) * sinTheta;
 			float z = tubeRadius * sinPhi;
 
+			float cx = mainRadius * cosTheta;
+			float cy = mainRadius * sinTheta;
+			float cz = 0;
+
+			glm::vec3 normal = glm::normalize(glm::vec3(x - cx, y - cy, z - cz));
+
 			// Pushing position (x,y,z)
 			vertices.push_back(x);
 			vertices.push_back(y);
@@ -41,6 +47,11 @@ void generateTorus(std::vector<float>& vertices, std::vector<unsigned int>& indi
 			vertices.push_back(0.5f + 0.5f * cosTheta); 
 			vertices.push_back(0.5f + 0.5f * cosPhi);   
 			vertices.push_back(0.5f + 0.5f * sinTheta); 
+
+			// Pushing normal (nx, ny, nz)
+			vertices.push_back(normal.x);
+			vertices.push_back(normal.y);
+			vertices.push_back(normal.z);
 		}
 	}
 
@@ -169,10 +180,12 @@ int main()
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO_Torus);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, torusIndices.size() * sizeof(unsigned int), torusIndices.data(), GL_STATIC_DRAW);
 
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 9 * sizeof(float), (void*)0);
 	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 9 * sizeof(float), (void*)(3 * sizeof(float)));
 	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 9 * sizeof(float), (void*)(6 * sizeof(float)));
+	glEnableVertexAttribArray(2);
 
 	glBindVertexArray(0);
 
@@ -197,10 +210,12 @@ int main()
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO_Torus2);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, torusIndices2.size() * sizeof(unsigned int), torusIndices2.data(), GL_STATIC_DRAW);
 
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 9 * sizeof(float), (void*)0);
 	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 9 * sizeof(float), (void*)(3 * sizeof(float)));
 	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 9 * sizeof(float), (void*)(6 * sizeof(float)));
+	glEnableVertexAttribArray(2);
 
 	glBindVertexArray(0);
 
@@ -212,25 +227,31 @@ int main()
 
 		glUseProgram(shaderProgram);
 
-		glm::mat4 projection = glm::perspective(glm::radians(45.0f), (float)SCREEN_WIDTH / (float)SCREEN_HEIGHT, 0.1f, 100.0f);
-
-		glm::mat4 view = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -6.0f));
+		int renderModeLoc = glGetUniformLocation(shaderProgram, "renderMode");
+		int lightPosLoc = glGetUniformLocation(shaderProgram, "lightPos");
+		int viewPosLoc = glGetUniformLocation(shaderProgram, "viewPos");
 
 		int modelLoc = glGetUniformLocation(shaderProgram, "model");
 		int viewLoc = glGetUniformLocation(shaderProgram, "view");
 		int projLoc = glGetUniformLocation(shaderProgram, "projection");
 
+		glm::mat4 view = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -7.0f));
+		glm::mat4 projection = glm::perspective(glm::radians(45.0f), (float)SCREEN_WIDTH / (float)SCREEN_HEIGHT, 0.1f, 100.0f);
+
 		glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
 		glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(projection));
+
+		glUniform3f(lightPosLoc, 2.0f, 2.0f, 5.0f); 
+		glUniform3f(viewPosLoc, 0.0f, 0.0f, 7.0f);    
 
 
 		float time = (float)glfwGetTime();
 
-		// Tetrahedron logic
+		// Tetrahedron rendering
+		glUniform1i(renderModeLoc, 0);
+
 		glm::mat4 modelTetra = glm::mat4(1.0f);
-
 		modelTetra = glm::rotate(modelTetra, time * 1.5f, glm::vec3(1.0f, 1.0f, 0.0f));
-
 		modelTetra = glm::scale(modelTetra, glm::vec3(0.85f));
 
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(modelTetra));
@@ -239,9 +260,10 @@ int main()
 		glDrawElements(GL_TRIANGLES, 12, GL_UNSIGNED_INT, 0);
 
 
-		// Torus1 logic
-		glm::mat4 modelTorus = glm::mat4(1.0f);
+		// Torus1 rendering
+		glUniform1i(renderModeLoc, 0);
 
+		glm::mat4 modelTorus = glm::mat4(1.0f);
 		modelTorus = glm::rotate(modelTorus, -time * 0.8f, glm::vec3(0.0f, 1.0f, 1.0f));
 
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(modelTorus));
@@ -249,21 +271,25 @@ int main()
 		glBindVertexArray(VAO_Torus);
 		glDrawElements(GL_TRIANGLES, static_cast<unsigned int>(torusIndices.size()), GL_UNSIGNED_INT, 0);
 
-		// Torus2 logic
+
+		// Torus2 rendering (Phong shading)
+		glUniform1i(renderModeLoc, 1); 
+
 		glm::mat4 modelTorus2 = glm::mat4(1.0f);
 
-		modelTorus2 = glm::translate(modelTorus2, glm::vec3(1.0f, 0.0f, 0.0f)); // tiny translation to the right
+		modelTorus2 = glm::translate(modelTorus2, glm::vec3(1.0f, 0.0f, 0.0f));
 
-		modelTorus2 = glm::rotate(modelTorus2, glm::radians(90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+		modelTorus2 = glm::rotate(modelTorus2, glm::radians(60.0f), glm::vec3(1.0f, 0.0f, 0.0f));
 
 		modelTorus2 = glm::rotate(modelTorus2, time * 1.0f, glm::vec3(0.0f, 1.0f, 0.0f));
 
-		modelTorus2 = glm::scale(modelTorus2, glm::vec3(1.2f)); // scalability
+		modelTorus2 = glm::scale(modelTorus2, glm::vec3(1.15f));
 
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(modelTorus2));
 
 		glBindVertexArray(VAO_Torus2);
 		glDrawElements(GL_TRIANGLES, static_cast<unsigned int>(torusIndices2.size()), GL_UNSIGNED_INT, 0);
+
 
 		glfwSwapBuffers(window);
 		glfwPollEvents();

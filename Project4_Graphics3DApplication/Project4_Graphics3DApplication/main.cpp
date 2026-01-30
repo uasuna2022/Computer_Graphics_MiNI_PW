@@ -158,6 +158,38 @@ int main()
 
 	glBindVertexArray(0);
 
+	// Floor generation
+	float floorVertices[] = {
+		 50.0f, -2.0f,  50.0f,  0.1f, 0.9f, 0.1f,         0.0f, 1.0f, 0.0f,
+		-50.0f, -2.0f,  50.0f,  0.1f, 0.9f, 0.1f,         0.0f, 1.0f, 0.0f,
+		-50.0f, -2.0f, -50.0f,  0.1f, 0.9f, 0.1f,         0.0f, 1.0f, 0.0f,
+		 50.0f, -2.0f, -50.0f,  0.1f, 0.9f, 0.1f,         0.0f, 1.0f, 0.0f
+	};
+
+	unsigned int floorIndices[] = {
+		0, 1, 2,
+		0, 2, 3  
+	};
+
+	unsigned int VBO_Floor, VAO_Floor, EBO_Floor;
+	glGenVertexArrays(1, &VAO_Floor);
+	glGenBuffers(1, &VBO_Floor);
+	glGenBuffers(1, &EBO_Floor);
+
+	glBindVertexArray(VAO_Floor);
+
+	glBindBuffer(GL_ARRAY_BUFFER, VBO_Floor);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(floorVertices), floorVertices, GL_STATIC_DRAW);
+
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO_Floor);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(floorIndices), floorIndices, GL_STATIC_DRAW);
+
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 9 * sizeof(float), (void*)0);
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 9 * sizeof(float), (void*)(3 * sizeof(float)));
+	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 9 * sizeof(float), (void*)(6 * sizeof(float)));
+	glEnableVertexAttribArray(2);
 	
 	// Torus1 generation 
 	
@@ -222,7 +254,24 @@ int main()
 
 	while (!glfwWindowShouldClose(window))
 	{
-		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+		// Time and Sun position calculation
+		float time = (float)glfwGetTime();
+		float sunRadius = 50.0F;
+		float daySpeed = 0.3F;
+
+		float lightX = cos(time * daySpeed) * sunRadius;
+		float lightZ = -10.0F;
+		float lightY = sin(time * daySpeed) * sunRadius;
+
+		float sunHeight = sin(time * daySpeed);
+		float dayFactor = glm::clamp(sunHeight, 0.0F, 1.0F);
+
+		glm::vec3 dayColor = glm::vec3(0.53F, 0.81F, 0.92F);
+		glm::vec3 nigthColor = glm::vec3(0.1F, 0.1F, 0.2F);
+
+		glm::vec3 skyColor = glm::mix(nigthColor, dayColor, dayFactor);
+
+		glClearColor(skyColor.r, skyColor.g, skyColor.b, 1.0F);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		glUseProgram(shaderProgram);
@@ -242,18 +291,6 @@ int main()
 		glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(projection));
 
 		glUniform3f(viewPosLoc, 0.0f, 0.0f, 7.0f);    
-
-
-		float time = (float)glfwGetTime();
-
-		// Light position animation
-		float lightRadius = 4.0f;
-		float lightSpeed = 0.8f;
-
-		float lightX = sin(time * lightSpeed) * lightRadius;
-		float lightZ = cos(time * lightSpeed) * lightRadius;
-		float lightY = 1.0f;
-
 		glUniform3f(lightPosLoc, lightX, lightY, lightZ);
 
 		// Tetrahedron rendering
@@ -268,6 +305,14 @@ int main()
 		glBindVertexArray(VAO1);
 		glDrawElements(GL_TRIANGLES, 12, GL_UNSIGNED_INT, 0);
 
+		// Floor rendering
+		glUniform1i(renderModeLoc, 1);
+
+		glm::mat4 modelFloor = glm::mat4(1.0f);
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(modelFloor));
+
+		glBindVertexArray(VAO_Floor);
+		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
 		// Torus1 rendering
 		glUniform1i(renderModeLoc, 0);
@@ -324,6 +369,14 @@ int main()
 	glDeleteVertexArrays(1, &VAO_Torus);
 	glDeleteBuffers(1, &VBO_Torus);
 	glDeleteBuffers(1, &EBO_Torus);
+
+	glDeleteVertexArrays(1, &VAO_Torus2);
+	glDeleteBuffers(1, &VBO_Torus2);
+	glDeleteBuffers(1, &EBO_Torus2);
+
+	glDeleteVertexArrays(1, &VAO_Floor);
+	glDeleteBuffers(1, &VBO_Floor);
+	glDeleteBuffers(1, &EBO_Floor);
 
 	glDeleteProgram(shaderProgram);
 

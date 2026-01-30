@@ -46,12 +46,13 @@ const char* fragmentShaderSource = R"(
 			vec3 lightColor = vec3(1.0, 1.0, 1.0);			// IL
 			vec3 norm = normalize(Normal);					// N
 			vec3 lightDir = normalize(lightPos - FragPos);	// L
-		    vec3 objColor = vec3(1.0, 1.0, 1.0);            // IO
+		    vec3 objColor = ourColor;            // IO (used to be 1.0, 1.0, 1.0)
 			
+			float diffuseStrength = 0.8;
 			float diff = max(dot(norm, lightDir), 0.0);
-			vec3 diffuse = diff * lightColor;
+			vec3 diffuse = diffuseStrength * diff * lightColor;
 
-			float specularStrength = 0.5;
+			float specularStrength = 0.2;
 			vec3 viewDir = normalize(viewPos - FragPos);	// V
 			vec3 reflectDir = reflect(-lightDir, norm);		// R
 

@@ -35,37 +35,58 @@ const char* fragmentShaderSource = R"(
 	uniform vec3 lightPos;
 	uniform vec3 viewPos;
 
+	uniform vec3 lanternPos;
+	uniform vec3 lanternColor;
+
 	void main()
 	{
 		if (renderMode == 0)
 		{
 			FragColor = vec4(ourColor, 1.0f);
 		}
-		else if (renderMode == 1)
+		else if (renderMode == 1) // Sun + Lantern lighting
 		{
-			vec3 lightColor = vec3(1.0, 1.0, 1.0);			// IL
 			vec3 norm = normalize(Normal);					// N
+			vec3 viewDir = normalize(viewPos - FragPos);	// V
+		    vec3 objColor = ourColor;                       // IO
+
+		    // Sunlight lighting
 			vec3 lightDir = normalize(lightPos - FragPos);	// L
-		    vec3 objColor = ourColor;            // IO (used to be 1.0, 1.0, 1.0)
+			vec3 sunColor = vec3(1.0f, 1.0f, 0.5f);      // Sunlight	
 			
 			float diffuseStrength = 0.8;
 			float diff = max(dot(norm, lightDir), 0.0);
-			vec3 diffuse = diffuseStrength * diff * lightColor;
+			vec3 sunDiffuse = diffuseStrength * diff * sunColor; // Diffuse component from Sun
 
 			float specularStrength = 0.2;
-			vec3 viewDir = normalize(viewPos - FragPos);	// V
 			vec3 reflectDir = reflect(-lightDir, norm);		// R
 
 			float spec = pow(max(dot(viewDir, reflectDir), 0.0), 32);
-			vec3 specular = specularStrength * spec * lightColor;
+			vec3 sunSpecular = specularStrength * spec * sunColor; // Specular component from Sun
 
-			vec3 result = (diffuse + specular) * objColor;
+			// Lantern lighting 
+			vec3 lanternDir = normalize(lanternPos - FragPos);	// L
+            float distance = length(lanternPos - FragPos); // Distance to lantern
+			float attenuation = 1.0 / (1.0 + 0.09 * distance + 0.032 * distance * distance); 
+
+			float diff2 = max(dot(norm, lanternDir), 0.0);
+			vec3 lanternDiffuse = diffuseStrength * diff2 * lanternColor; // Diffuse component from Lantern
+
+			vec3 reflectDir2 = reflect(-lanternDir, norm);		// R
+			float spec2 = pow(max(dot(viewDir, reflectDir2), 0.0), 32);
+			vec3 lanternSpecular = specularStrength * spec2 * lanternColor; // Specular component from Lantern
+
+		    vec3 lanternResult = (lanternDiffuse + lanternSpecular) * attenuation;
+			vec3 sunResult = sunDiffuse + sunSpecular;
+
+
+			vec3 result = (lanternResult + sunResult) * objColor;
 
 			FragColor = vec4(result, 1.0f);
 		}
 		else if (renderMode == 2)
         {
-             FragColor = vec4(1.0f, 1.0f, 0.0f, 1.0f); // For light source
+             FragColor = vec4(1.0f, 1.0f, 0.5f, 1.0f); // For light source
         }
 	}
 )";

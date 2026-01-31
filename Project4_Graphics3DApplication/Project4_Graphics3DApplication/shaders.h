@@ -38,6 +38,8 @@ const char* fragmentShaderSource = R"(
 	uniform vec3 lanternPos;
 	uniform vec3 lanternColor;
 
+	uniform vec3 objectColor;
+
 	void main()
 	{
 		if (renderMode == 0)
@@ -67,7 +69,7 @@ const char* fragmentShaderSource = R"(
 			// Lantern lighting 
 			vec3 lanternDir = normalize(lanternPos - FragPos);	// L
             float distance = length(lanternPos - FragPos); // Distance to lantern
-			float attenuation = 1.0 / (1.0 + 0.09 * distance + 0.032 * distance * distance); 
+			float attenuation = 1.0 / (1.0 + 0.22 * distance + 0.0019 * distance * distance); 
 
 			float diff2 = max(dot(norm, lanternDir), 0.0);
 			vec3 lanternDiffuse = diffuseStrength * diff2 * lanternColor; // Diffuse component from Lantern
@@ -86,7 +88,7 @@ const char* fragmentShaderSource = R"(
 		}
 		else if (renderMode == 2)
         {
-             FragColor = vec4(1.0f, 1.0f, 0.5f, 1.0f); // For light source
+             FragColor = vec4(objectColor, 1.0f); // For light source
         }
 	}
 )";

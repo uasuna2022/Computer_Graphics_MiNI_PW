@@ -418,6 +418,7 @@ int main()
 		int modelLoc = glGetUniformLocation(shaderProgram, "model");
 		int viewLoc = glGetUniformLocation(shaderProgram, "view");
 		int projLoc = glGetUniformLocation(shaderProgram, "projection");
+		int objectColorLoc = glGetUniformLocation(shaderProgram, "objectColor");
 
 
 		// Switching camera modes logic
@@ -428,7 +429,7 @@ int main()
 		switch (cameraMode)
 		{
 			case 0:
-				cameraPos = glm::vec3(0.0f, 3.0f, 10.0f);
+				cameraPos = glm::vec3(0.0f, 10.0f, 20.0f);
 				cameraTarget = glm::vec3(0.0f, 0.0f, 0.0f);
 				break;
 			case 1:
@@ -436,7 +437,7 @@ int main()
 				cameraTarget = spherePos;
 				break;
 			case 2:
-				cameraPos = spherePos + glm::vec3(0.0f, 15.0f, 0.0f);
+				cameraPos = spherePos + glm::vec3(0.0f, 10.0f, 0.0f);
 				cameraTarget = glm::vec3(0.0f, 0.0f, 0.0f);
 				break;
 		}
@@ -453,32 +454,34 @@ int main()
 		glUniform3f(viewPosLoc, cameraPos.x, cameraPos.y, cameraPos.z);
 
 		// Lantern rendering
-		glm::vec3 lanternPos = glm::vec3(-5.0f, 2.0f, -5.0f);
-		glm::vec3 lanternColor = glm::vec3(1.0f, 0.8f, 0.6f);
+		glm::vec3 lanternPos = glm::vec3(0.5f, 6.0f, -1.5f);
+		glm::vec3 lanternColor = glm::vec3(1.0f, 0.5f, 0.0f);
 
 		int lanternPosLoc = glGetUniformLocation(shaderProgram, "lanternPos");
 		int lanternColorLoc = glGetUniformLocation(shaderProgram, "lanternColor");
 
 		glUniform3f(lanternPosLoc, lanternPos.x, lanternPos.y, lanternPos.z);
-		glUniform3f(lanternColorLoc, lanternColor.x, lanternColor.y, lanternColor.z);
+		glUniform3f(lanternColorLoc, 5 * lanternColor.x, 5 * lanternColor.y, 5 * lanternColor.z);
 
+		// Lantern pole rendering
 		glUniform1i(renderModeLoc, 1);
 		glm::mat4 modelLanternPole = glm::mat4(1.0f);
-		modelLanternPole = glm::translate(modelLanternPole, glm::vec3(-5.0f, 0.0f, -5.0f));
-		modelLanternPole = glm::scale(modelLanternPole, glm::vec3(0.1f, 4.0f, 0.1f));
+		modelLanternPole = glm::translate(modelLanternPole, glm::vec3(0.5f, 2.0f, -1.5f));
+		modelLanternPole = glm::scale(modelLanternPole, glm::vec3(0.2f, 8.0f, 0.2f));
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(modelLanternPole));
 		glBindVertexArray(cubeVAO);
 		glDrawArrays(GL_TRIANGLES, 0, 36);
 
+		// Lantern bulb rendering
 		glUniform1i(renderModeLoc, 2);
-
+		glUniform3f(objectColorLoc, lanternColor.x, lanternColor.y, lanternColor.z);
 		glm::mat4 modelLanternBulb = glm::mat4(1.0f);
 		modelLanternBulb = glm::translate(modelLanternBulb, lanternPos); 
-		modelLanternBulb = glm::scale(modelLanternBulb, glm::vec3(0.5f)); 
+		modelLanternBulb = glm::scale(modelLanternBulb, glm::vec3(0.4f)); 
 
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(modelLanternBulb));
-		glBindVertexArray(cubeVAO);
-		glDrawArrays(GL_TRIANGLES, 0, 36);
+		glBindVertexArray(sphereVAO);
+		glDrawElements(GL_TRIANGLES, (unsigned int)sphereIndices.size(), GL_UNSIGNED_INT, 0);
 
 		// Floor rendering
 		glUniform1i(renderModeLoc, 1);
@@ -500,6 +503,7 @@ int main()
 		
 		// Light source rendering 
 		glUniform1i(renderModeLoc, 2);
+		glUniform3f(objectColorLoc, 1.0f, 1.0f, 0.5f);
 
 		glm::mat4 modelLight = glm::mat4(1.0f);
 

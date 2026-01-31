@@ -454,19 +454,19 @@ int main()
 		glUniform3f(viewPosLoc, cameraPos.x, cameraPos.y, cameraPos.z);
 
 		// Lantern rendering
-		glm::vec3 lanternPos = glm::vec3(0.5f, 6.0f, -1.5f);
+		glm::vec3 lanternPos = glm::vec3(0.5f, 6.0f, 2.0f);
 		glm::vec3 lanternColor = glm::vec3(1.0f, 0.5f, 0.0f);
 
 		int lanternPosLoc = glGetUniformLocation(shaderProgram, "lanternPos");
 		int lanternColorLoc = glGetUniformLocation(shaderProgram, "lanternColor");
 
 		glUniform3f(lanternPosLoc, lanternPos.x, lanternPos.y, lanternPos.z);
-		glUniform3f(lanternColorLoc, 5 * lanternColor.x, 5 * lanternColor.y, 5 * lanternColor.z);
+		glUniform3f(lanternColorLoc, 3 * lanternColor.x, 3 * lanternColor.y, 3 * lanternColor.z);
 
 		// Lantern pole rendering
 		glUniform1i(renderModeLoc, 1);
 		glm::mat4 modelLanternPole = glm::mat4(1.0f);
-		modelLanternPole = glm::translate(modelLanternPole, glm::vec3(0.5f, 2.0f, -1.5f));
+		modelLanternPole = glm::translate(modelLanternPole, glm::vec3(0.5f, 2.0f, 2.0f));
 		modelLanternPole = glm::scale(modelLanternPole, glm::vec3(0.2f, 8.0f, 0.2f));
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(modelLanternPole));
 		glBindVertexArray(cubeVAO);

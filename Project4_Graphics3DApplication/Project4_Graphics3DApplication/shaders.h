@@ -52,6 +52,9 @@ const char* fragmentShaderSource = R"(
 			vec3 viewDir = normalize(viewPos - FragPos);	// V
 		    vec3 objColor = ourColor;                       // IO
 
+			float ambientStrength = 0.1;
+			vec3 ambient = ambientStrength * vec3(1.0f, 1.0f, 1.0f); // Ambient component
+
 		    // Sunlight lighting
 			vec3 lightDir = normalize(lightPos - FragPos);	// L
 			vec3 sunColor = vec3(1.0f, 1.0f, 0.5f);      // Sunlight	
@@ -82,7 +85,7 @@ const char* fragmentShaderSource = R"(
 			vec3 sunResult = sunDiffuse + sunSpecular;
 
 
-			vec3 result = (lanternResult + sunResult) * objColor;
+			vec3 result = (lanternResult + sunResult + ambient) * objColor;
 
 			FragColor = vec4(result, 1.0f);
 		}

@@ -12,6 +12,30 @@
 #include <glm/gtc/type_ptr.hpp>
 
 const float PI = 3.14159265358979323846F;
+int cameraMode = 0; // 0 - basic fixed camera observing a scene, 1 - fixed camera following the moving sphere,
+                    // 2 - camera connected with the moving sphere (third-person perspective)
+
+void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
+{
+	if (action == GLFW_PRESS)
+	{
+		if (key == GLFW_KEY_RIGHT)
+		{
+			cameraMode = (cameraMode + 1) % 3;
+			std::cout << "Camera mode switched to: " << cameraMode << std::endl;
+		}
+		if (key == GLFW_KEY_LEFT)
+		{
+			cameraMode = (cameraMode + 2) % 3;
+			std::cout << "Camera mode switched to: " << cameraMode << std::endl;
+		}
+		if (key == GLFW_KEY_ESCAPE)
+		{
+			glfwSetWindowShouldClose(window, true);
+			std::cout << "Escape pressed. Exiting program.\n";
+		}
+	}
+}
 
 void generateTorus(std::vector<float>& vertices, std::vector<unsigned int>& indices,
 	float mainRadius, float tubeRadius,
@@ -151,6 +175,7 @@ int main()
 	}
 
 	glfwMakeContextCurrent(window);
+	glfwSetKeyCallback(window, key_callback);
 
 	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
 	{
@@ -176,104 +201,6 @@ int main()
 
 	glDeleteShader(vertexShader);
 	glDeleteShader(fragmentShader);
-
-	/*
-	// Tetraid generation
-	float vertices1[] = {
-		// positions           // colors
-		1.0f,  1.0f,  1.0f,    1.0f, 0.0f, 0.0f, // v0 - red
-		-1.0f, -1.0f,  1.0f,    0.0f, 1.0f, 0.0f, // v1 - green
-		-1.0f,  1.0f, -1.0f,    0.0f, 0.0f, 1.0f, // v2 - blue
-		1.0f, -1.0f, -1.0f,    1.0f, 1.0f, 0.0f  // v3 - yellow
-	};
-
-	unsigned int indices1[] = {
-					0, 1, 2,
-					0, 3, 1,
-					0, 2, 3,
-					1, 3, 2
-	};
-
-	unsigned int VBO1, VAO1, EBO1;
-
-	glGenVertexArrays(1, &VAO1);
-	glGenBuffers(1, &VBO1);
-	glGenBuffers(1, &EBO1);
-
-	glBindVertexArray(VAO1);
-	glBindBuffer(GL_ARRAY_BUFFER, VBO1);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices1), vertices1, GL_STATIC_DRAW);
-
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO1);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices1), indices1, GL_STATIC_DRAW);
-
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
-	glEnableVertexAttribArray(0);
-
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
-	glEnableVertexAttribArray(1);
-
-	glBindVertexArray(0);
-	
-	// Torus1 generation 
-	std::vector<float> torusVertices;
-	std::vector<unsigned int> torusIndices;
-
-	
-	generateTorus(torusVertices, torusIndices, 1.0f, 0.2f, 50, 30);
-
-	unsigned int VBO_Torus, VAO_Torus, EBO_Torus;
-	glGenVertexArrays(1, &VAO_Torus);
-	glGenBuffers(1, &VBO_Torus);
-	glGenBuffers(1, &EBO_Torus);
-
-	glBindVertexArray(VAO_Torus);
-
-	glBindBuffer(GL_ARRAY_BUFFER, VBO_Torus);
-	glBufferData(GL_ARRAY_BUFFER, torusVertices.size() * sizeof(float), torusVertices.data(), GL_STATIC_DRAW);
-
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO_Torus);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, torusIndices.size() * sizeof(unsigned int), torusIndices.data(), GL_STATIC_DRAW);
-
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 9 * sizeof(float), (void*)0);
-	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 9 * sizeof(float), (void*)(3 * sizeof(float)));
-	glEnableVertexAttribArray(1);
-	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 9 * sizeof(float), (void*)(6 * sizeof(float)));
-	glEnableVertexAttribArray(2);
-
-	glBindVertexArray(0);
-
-	// Torus2 generation 
-
-	std::vector<float> torusVertices2;
-	std::vector<unsigned int> torusIndices2;
-
-
-	generateTorus(torusVertices2, torusIndices2, 1.0f, 0.2f, 50, 30);
-
-	unsigned int VBO_Torus2, VAO_Torus2, EBO_Torus2;
-	glGenVertexArrays(1, &VAO_Torus2);
-	glGenBuffers(1, &VBO_Torus2);
-	glGenBuffers(1, &EBO_Torus2);
-
-	glBindVertexArray(VAO_Torus2);
-
-	glBindBuffer(GL_ARRAY_BUFFER, VBO_Torus2);
-	glBufferData(GL_ARRAY_BUFFER, torusVertices2.size() * sizeof(float), torusVertices2.data(), GL_STATIC_DRAW);
-
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO_Torus2);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, torusIndices2.size() * sizeof(unsigned int), torusIndices2.data(), GL_STATIC_DRAW);
-
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 9 * sizeof(float), (void*)0);
-	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 9 * sizeof(float), (void*)(3 * sizeof(float)));
-	glEnableVertexAttribArray(1);
-	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 9 * sizeof(float), (void*)(6 * sizeof(float)));
-	glEnableVertexAttribArray(2);
-
-	glBindVertexArray(0);
-	*/
 
 	// Floor generation
 	float floorVertices[] = {
@@ -399,6 +326,17 @@ int main()
 		float lightZ = -10.0F;
 		float lightY = sin(time * daySpeed) * sunRadius;
 
+		// Sphere position calculation
+		float sphereOrbitRadius = 5.0f;
+		float sphereSpeed = 1.0f;
+		float height = 3.5f;
+
+		float sphereX = sin(time * sphereSpeed) * sphereOrbitRadius;
+		float sphereY = height;
+		float sphereZ = cos(time * sphereSpeed) * sphereOrbitRadius;
+		glm::vec3 spherePos = glm::vec3(sphereX, sphereY, sphereZ);
+
+		// Sky color calculation based on sun height
 		float sunHeight = sin(time * daySpeed);
 		float dayFactor = glm::clamp(sunHeight, 0.0F, 1.0F);
 
@@ -410,8 +348,8 @@ int main()
 		glClearColor(skyColor.r, skyColor.g, skyColor.b, 1.0F);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+		// Shader and uniforms setup
 		glUseProgram(shaderProgram);
-
 		int renderModeLoc = glGetUniformLocation(shaderProgram, "renderMode");
 		int lightPosLoc = glGetUniformLocation(shaderProgram, "lightPos");
 		int viewPosLoc = glGetUniformLocation(shaderProgram, "viewPos");
@@ -420,16 +358,36 @@ int main()
 		int viewLoc = glGetUniformLocation(shaderProgram, "view");
 		int projLoc = glGetUniformLocation(shaderProgram, "projection");
 
-		glm::vec3 cameraPos = glm::vec3(0.0f, 3.0f, 10.0f);
-		glm::vec3 cameraTarget = glm::vec3(0.0f, 0.0f, 0.0f);
+
+		// Switching camera modes logic
+		glm::vec3 cameraPos;
+		glm::vec3 cameraTarget;
 		glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
 
+		switch (cameraMode)
+		{
+			case 0:
+				cameraPos = glm::vec3(0.0f, 3.0f, 10.0f);
+				cameraTarget = glm::vec3(0.0f, 0.0f, 0.0f);
+				break;
+			case 1:
+				cameraPos = glm::vec3(10.0f, 5.0f, 10.0f);
+				cameraTarget = spherePos;
+				break;
+			case 2:
+				cameraPos = spherePos + glm::vec3(0.0f, 15.0f, 0.0f);
+				cameraTarget = glm::vec3(0.0f, 0.0f, 0.0f);
+				break;
+		}
+
+		// View and projection matrices setup
 		glm::mat4 view = glm::lookAt(cameraPos, cameraTarget, cameraUp);
 		glm::mat4 projection = glm::perspective(glm::radians(45.0f), (float)SCREEN_WIDTH / (float)SCREEN_HEIGHT, 0.1f, 100.0f);
 
 		glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
 		glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(projection));
 
+		// Setting light and view positions
 		glUniform3f(lightPosLoc, lightX, lightY, lightZ);
 		glUniform3f(viewPosLoc, cameraPos.x, cameraPos.y, cameraPos.z);
 
@@ -461,8 +419,8 @@ int main()
 
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(modelLight));
 
-		glBindVertexArray(tetraVAO);
-		glDrawArrays(GL_TRIANGLES, 0, 12);
+		glBindVertexArray(sphereVAO);
+		glDrawElements(GL_TRIANGLES, (unsigned int)sphereIndices.size(), GL_UNSIGNED_INT, 0);
 
 		// Tetroid rendering
 		glUniform1i(renderModeLoc, 1);
@@ -478,18 +436,12 @@ int main()
 		// Sphere rendering
 		glUniform1i(renderModeLoc, 1);
 		glm::mat4 modelSphere = glm::mat4(1.0f);
-
-		float sphereOrbitRadius = 5.0f;
-		float sphereSpeed = 1.0f;
-		float height = 3.5f;
-		modelSphere = glm::translate(modelSphere, glm::vec3(sin(time * sphereSpeed) * sphereOrbitRadius, 
-			height, cos(time * sphereSpeed) * sphereOrbitRadius));
-
+		modelSphere = glm::translate(modelSphere, spherePos);
 		modelSphere = glm::scale(modelSphere, glm::vec3(0.3f));
-
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(modelSphere));
 		glBindVertexArray(sphereVAO);
 		glDrawElements(GL_TRIANGLES, (unsigned int)sphereIndices.size(), GL_UNSIGNED_INT, 0);
+		
 
 
 		glfwSwapBuffers(window);

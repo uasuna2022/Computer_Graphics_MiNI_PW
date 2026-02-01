@@ -18,6 +18,8 @@ int cameraMode = 0; // 0 - basic fixed camera observing a scene, 1 - fixed camer
 float spotAngleH = 0.0f;
 float spotAngleV = 0.0f;
 
+bool perspective = true;
+
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
 	if (action == GLFW_PRESS)
@@ -36,6 +38,14 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 		{
 			glfwSetWindowShouldClose(window, true);
 			std::cout << "Escape pressed. Exiting program.\n";
+		}
+		if (key == GLFW_KEY_P)
+		{
+			perspective = !perspective;
+			if (perspective)
+				std::cout << "Perspective projection enabled.\n";
+			else
+				std::cout << "Orthographic projection enabled.\n";
 		}
 	}
 }
@@ -462,9 +472,14 @@ int main()
 				break;
 		}
 
+		float aspectRatio = (float)SCREEN_WIDTH / (float)SCREEN_HEIGHT;
+		float orthoHeight = 20.0f;
+		float orthoWidth = orthoHeight * aspectRatio;
+
 		// View and projection matrices setup
 		glm::mat4 view = glm::lookAt(cameraPos, cameraTarget, cameraUp);
-		glm::mat4 projection = glm::perspective(glm::radians(45.0f), (float)SCREEN_WIDTH / (float)SCREEN_HEIGHT, 0.1f, 100.0f);
+		glm::mat4 projection = (perspective) ? glm::perspective(glm::radians(55.0f), (float)SCREEN_WIDTH / (float)SCREEN_HEIGHT, 0.1f, 500.0f)
+			: glm::ortho(-orthoWidth, orthoWidth, -orthoHeight, orthoHeight, -100.0f, 100.0f);
 
 		glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
 		glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(projection));

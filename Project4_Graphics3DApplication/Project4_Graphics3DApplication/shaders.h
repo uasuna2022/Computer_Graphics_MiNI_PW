@@ -45,6 +45,9 @@ const char* fragmentShaderSource = R"(
 	uniform float spotCutOff;
 	uniform float spotOuterCutOff;
 
+	uniform vec3 skyColor;
+	uniform float fogDensity;
+
 	void main()
 	{
 		if (renderMode == 0)
@@ -121,5 +124,12 @@ const char* fragmentShaderSource = R"(
         {
              FragColor = vec4(objectColor, 1.0f); // For light source
         }
+
+		float dist = length(FragPos - viewPos);
+		float fogStart = 10.0F;
+		float fogEnd = fogDensity;
+		float fogFactor = clamp((fogEnd - dist) / (fogEnd - fogStart), 0.0, 1.0);
+		vec3 resultWithFog = mix(skyColor, vec3(FragColor), fogFactor);
+		FragColor = vec4(resultWithFog, 1.0f);
 	}
 )";

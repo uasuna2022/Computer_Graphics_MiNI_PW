@@ -20,6 +20,8 @@ float spotAngleV = 0.0f;
 
 bool perspective = true;
 
+float fogDensity = 50.0f;
+
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
 	if (action == GLFW_PRESS)
@@ -46,6 +48,20 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 				std::cout << "Perspective projection enabled.\n";
 			else
 				std::cout << "Orthographic projection enabled.\n";
+		}
+		if (key == GLFW_KEY_DOWN)
+		{
+			fogDensity += 2.0F;
+			if (fogDensity > 100.0F)
+				fogDensity = 100.0F;
+			std::cout << "Fog Density: " << fogDensity << std::endl;
+		}
+		if (key == GLFW_KEY_UP)
+		{
+			fogDensity -= 2.0F;
+			if (fogDensity < 10.0F)
+				fogDensity = 10.0F;
+			std::cout << "Fog Density: " << fogDensity << std::endl;
 		}
 	}
 }
@@ -449,6 +465,8 @@ int main()
 		int viewLoc = glGetUniformLocation(shaderProgram, "view");
 		int projLoc = glGetUniformLocation(shaderProgram, "projection");
 		int objectColorLoc = glGetUniformLocation(shaderProgram, "objectColor");
+		int skyColorLoc = glGetUniformLocation(shaderProgram, "skyColor");
+		int fogDensityLoc = glGetUniformLocation(shaderProgram, "fogDensity");
 
 
 		// Switching camera modes logic
@@ -487,6 +505,12 @@ int main()
 		// Setting light and view positions
 		glUniform3f(lightPosLoc, lightX, lightY, lightZ);
 		glUniform3f(viewPosLoc, cameraPos.x, cameraPos.y, cameraPos.z);
+
+		// Setting sky color
+		glUniform3f(skyColorLoc, skyColor.r, skyColor.g, skyColor.b);
+		
+		// Setting fog density
+		glUniform1f(fogDensityLoc, fogDensity);
 
 		// Lantern rendering
 		glm::vec3 lanternPos = glm::vec3(0.5f, 6.0f, 2.0f);

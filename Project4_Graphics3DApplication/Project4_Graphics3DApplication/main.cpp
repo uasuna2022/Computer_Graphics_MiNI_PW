@@ -15,6 +15,9 @@ const float PI = 3.14159265358979323846F;
 int cameraMode = 0; // 0 - basic fixed camera observing a scene, 1 - fixed camera following the moving sphere,
                     // 2 - camera connected with the moving sphere (third-person perspective)
 
+float spotAngleH = 0.0f;
+float spotAngleV = 0.0f;
+
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
 	if (action == GLFW_PRESS)
@@ -397,6 +400,23 @@ int main()
 		float sphereZ = cos(time * sphereSpeed) * sphereOrbitRadius;
 		glm::vec3 spherePos = glm::vec3(sphereX, sphereY, sphereZ);
 
+		float spotSpeed = 0.0016f;
+		if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) spotAngleV += spotSpeed;
+		if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) spotAngleV -= spotSpeed;
+		if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) spotAngleH += spotSpeed;
+		if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) spotAngleH -= spotSpeed;
+		if (spotAngleV > 1.5f) spotAngleV = 1.5f;
+		if (spotAngleV < -1.5f) spotAngleV = -1.5f;
+
+		float r = 0.28f;
+		float localX = r * sin(spotAngleH) * cos(spotAngleV);
+		float localY = r * sin(spotAngleV);
+		float localZ = r * cos(spotAngleH) * cos(spotAngleV);
+
+		glm::vec3 spotRelativePos = glm::vec3(localX, localY, localZ);
+		glm::vec3 spotLightPosWorld = spherePos + spotRelativePos;
+		glm::vec3 spotLightDir = glm::normalize(spotRelativePos);
+
 		// Sky color calculation based on sun height
 		float sunHeight = sin(time * daySpeed);
 		float dayFactor = glm::clamp(sunHeight, 0.0F, 1.0F);
@@ -462,6 +482,28 @@ int main()
 
 		glUniform3f(lanternPosLoc, lanternPos.x, lanternPos.y, lanternPos.z);
 		glUniform3f(lanternColorLoc, 3 * lanternColor.x, 3 * lanternColor.y, 3 * lanternColor.z);
+
+		// Spotlight uniforms
+		int spotlightPosLoc = glGetUniformLocation(shaderProgram, "spotPos");
+		int spotlightDirLoc = glGetUniformLocation(shaderProgram, "spotDir");
+		int spotlightCutOffLoc = glGetUniformLocation(shaderProgram, "spotCutOff");
+		int spotlightOuterCutOffLoc = glGetUniformLocation(shaderProgram, "spotOuterCutOff");
+
+		glUniform3f(spotlightPosLoc, spotLightPosWorld.x, spotLightPosWorld.y, spotLightPosWorld.z);
+		glUniform3f(spotlightDirLoc, spotLightDir.x, spotLightDir.y, spotLightDir.z);
+		glUniform1f(spotlightCutOffLoc, glm::cos(glm::radians(12.5f)));
+		glUniform1f(spotlightOuterCutOffLoc, glm::cos(glm::radians(17.5f)));
+
+		// Reflector rendering
+		glUniform1i(renderModeLoc, 2);
+		glUniform3f(objectColorLoc, 1.0f, 1.0f, 1.0f);
+		glm::mat4 modelReflector = glm::mat4(1.0f);
+		modelReflector = glm::translate(modelReflector, spotLightPosWorld);
+		modelReflector = glm::scale(modelReflector, glm::vec3(0.1f));
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(modelReflector));
+		glBindVertexArray(tetraVAO);
+		glDrawArrays(GL_TRIANGLES, 0, 12);
+
 
 		// Lantern pole rendering
 		glUniform1i(renderModeLoc, 1);

@@ -40,6 +40,11 @@ const char* fragmentShaderSource = R"(
 
 	uniform vec3 objectColor;
 
+	uniform vec3 spotPos;
+	uniform vec3 spotDir;
+	uniform float spotCutOff;
+	uniform float spotOuterCutOff;
+
 	void main()
 	{
 		if (renderMode == 0)
@@ -84,8 +89,31 @@ const char* fragmentShaderSource = R"(
 		    vec3 lanternResult = (lanternDiffuse + lanternSpecular) * attenuation;
 			vec3 sunResult = sunDiffuse + sunSpecular;
 
+			// Spotlight
+			vec3 spotlightDir = normalize(spotPos - FragPos);
+			vec3 spotResult = vec3(0.0f);
+            float theta = dot(spotlightDir, normalize(-spotDir));
+			
+			if (theta > spotOuterCutOff)
+			{
+				float epsilon = spotCutOff - spotOuterCutOff;
+				float intensity = clamp((theta - spotOuterCutOff) / epsilon, 0.0, 1.0);
 
-			vec3 result = (lanternResult + sunResult + ambient) * objColor;
+				float distS = length(spotPos - FragPos);
+				float attS = 1.0 / (1.0 + 0.01 * distS + 0.005 * distS * distS);				
+
+				float diff3 = max(dot(norm, spotlightDir), 0.0);
+				vec3 spotDiffuse = diffuseStrength * diff3 * vec3(1.0f, 1.0f, 1.0f); 
+
+				vec3 reflectDir3 = reflect(-spotlightDir, norm);		
+				float spec3 = pow(max(dot(viewDir, reflectDir3), 0.0), 32);
+				vec3 spotSpecular = specularStrength * spec3 * vec3(1.0f, 1.0f, 1.0f); 
+
+				spotResult = (spotDiffuse + spotSpecular) * intensity * attS;
+			}
+
+
+			vec3 result = (lanternResult + sunResult + spotResult + ambient) * objColor;
 
 			FragColor = vec4(result, 1.0f);
 		}
